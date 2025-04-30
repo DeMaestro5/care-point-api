@@ -1,5 +1,5 @@
 import { model, Schema, Types } from 'mongoose';
-import Role from './Role';
+import { RoleCode } from './Role';
 
 export const DOCUMENT_NAME = 'User';
 export const COLLECTION_NAME = 'users';
@@ -10,7 +10,7 @@ export default interface User {
   profilePicUrl?: string;
   email?: string;
   password?: string;
-  role: Role;
+  role: RoleCode;
   verified?: boolean;
   status?: boolean;
   createdAt?: Date;
@@ -40,8 +40,8 @@ const schema = new Schema<User>(
       select: false,
     },
     role: {
-      type: Schema.Types.ObjectId,
-      ref: 'Role',
+      type: Schema.Types.String,
+      enum: Object.values(RoleCode),
       required: true,
     },
     verified: {

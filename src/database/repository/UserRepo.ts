@@ -1,5 +1,5 @@
 import User, { UserModel } from '../model/User';
-import { RoleModel } from '../model/Role';
+import { RoleModel, RoleCode } from '../model/Role';
 import { InternalError } from '../../core/ApiError';
 import { Types } from 'mongoose';
 import KeystoreRepo from './KeystoreRepo';
@@ -16,9 +16,8 @@ async function findPrivateProfileById(
   return UserModel.findOne({ _id: id, status: true })
     .select('+email')
     .populate({
-      path: 'roles',
-      match: { status: true },
-      select: { code: 1 },
+      path: 'role',
+      select: 'code status',
     })
     .lean<User>()
     .exec();
@@ -27,10 +26,10 @@ async function findPrivateProfileById(
 // contains critical information of the user
 async function findById(id: Types.ObjectId): Promise<User | null> {
   return UserModel.findOne({ _id: id, status: true })
-    .select('+email +password +roles')
+    .select('+email +password')
     .populate({
-      path: 'roles',
-      match: { status: true },
+      path: 'role',
+      select: 'code status',
     })
     .lean()
     .exec();
@@ -38,13 +37,10 @@ async function findById(id: Types.ObjectId): Promise<User | null> {
 
 async function findByEmail(email: string): Promise<User | null> {
   return UserModel.findOne({ email: email })
-    .select(
-      '+email +password +roles +gender +dob +grade +country +state +city +school +bio +hobbies',
-    )
+    .select('+email +password')
     .populate({
-      path: 'roles',
-      match: { status: true },
-      select: { code: 1 },
+      path: 'role',
+      select: 'code status',
     })
     .lean()
     .exec();
@@ -71,13 +67,7 @@ async function create(
 ): Promise<{ user: User; keystore: Keystore }> {
   const now = new Date();
 
-  const role = await RoleModel.findOne({ code: roleCode })
-    .select('+code')
-    .lean()
-    .exec();
-  if (!role) throw new InternalError('Role must be defined');
-
-  user.role = role;
+  user.role = roleCode as RoleCode;
   user.createdAt = user.updatedAt = now;
   const createdUser = await UserModel.create(user);
   const keystore = await KeystoreRepo.create(
@@ -86,7 +76,7 @@ async function create(
     refreshTokenKey,
   );
   return {
-    user: { ...createdUser.toObject(), role: user.role },
+    user: createdUser.toObject(),
     keystore: keystore,
   };
 }

@@ -48,10 +48,7 @@ router.post(
     new SuccessResponse('Signup Successful', {
       user: {
         ...userData,
-        role: {
-          code: createdUser.role.code,
-          status: createdUser.role.status,
-        },
+        role: createdUser.role,
       },
       tokens: tokens,
     }).send(res);
