@@ -26,6 +26,7 @@
   "author": "Janishar Ali",
   "license": "Apache-2.0",
   "dependencies": {
+    "@types/nodemailer": "^6.4.17",
     "axios": "^1.6.5",
     "bcrypt": "^5.1.1",
     "cookie-parser": "^1.4.6",
@@ -39,6 +40,7 @@
     "mongoose": "^8.0.3",
     "multer": "^1.4.5-lts.1",
     "newrelic": "^11.8.0",
+    "nodemailer": "^6.10.1",
     "qs": "^6.11.2",
     "redis": "^4.6.12",
     "winston": "^3.11.0",

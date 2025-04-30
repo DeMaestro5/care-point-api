@@ -13,6 +13,8 @@ export default interface User {
   role: RoleCode;
   verified?: boolean;
   status?: boolean;
+  resetPasswordToken?: string;
+  resetPasswordExpires?: number;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -52,6 +54,14 @@ const schema = new Schema<User>(
       type: Schema.Types.Boolean,
       default: true,
     },
+    resetPasswordToken: {
+      type: Schema.Types.String,
+      select: false,
+    },
+    resetPasswordExpires: {
+      type: Schema.Types.Number,
+      select: false,
+    },
     createdAt: {
       type: Schema.Types.Date,
       required: true,
@@ -71,5 +81,6 @@ const schema = new Schema<User>(
 schema.index({ _id: 1, status: 1 });
 schema.index({ email: 1 });
 schema.index({ status: 1 });
+schema.index({ resetPasswordToken: 1 });
 
 export const UserModel = model<User>(DOCUMENT_NAME, schema, COLLECTION_NAME);

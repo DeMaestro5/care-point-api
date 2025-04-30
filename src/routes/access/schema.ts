@@ -24,4 +24,11 @@ export default {
       .valid(...Object.values(RoleCode))
       .required(),
   }),
+  forgotPassword: Joi.object().keys({
+    email: Joi.string().required().email(),
+  }),
+  resetPassword: Joi.object().keys({
+    token: Joi.string().required(),
+    password: Joi.string().required().min(8),
+  }),
 };

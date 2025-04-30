@@ -8,6 +8,8 @@ import logout from './access/logout';
 import token from './access/token';
 import credential from './access/credential';
 import profile from './profile';
+import forgotPassword from './access/forgot-password';
+import resetPassword from './access/reset-password';
 
 const router = express.Router();
 
@@ -23,5 +25,7 @@ router.use('/logout', logout);
 router.use('/token', token);
 router.use('/credential', credential);
 router.use('/profile', profile);
+router.use('/forgot-password', forgotPassword);
+router.use('/reset-password', resetPassword);
 
 export default router;
