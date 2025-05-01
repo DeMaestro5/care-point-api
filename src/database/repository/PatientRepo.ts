@@ -1,0 +1,96 @@
+import Patient, { PatientModel } from '../model/Patient';
+import { Types } from 'mongoose';
+
+// Enhanced findById with debug logging
+async function findById(id: Types.ObjectId): Promise<Patient | null> {
+  console.log(`Finding patient by ID: ${id}, type: ${typeof id}`);
+
+  // First attempt - Check if the patient exists without any filters
+  const patientExists = await PatientModel.exists({ _id: id });
+  console.log(`Patient exists check: ${patientExists}`);
+
+  // Second attempt - Find without the status filter to check if it's a status issue
+  const patientWithoutStatus = await PatientModel.findOne({ _id: id })
+    .populate('user', 'name email profilePicUrl')
+    .lean()
+    .exec();
+  console.log(
+    `Patient without status filter: ${
+      patientWithoutStatus ? 'Found' : 'Not found'
+    }`,
+  );
+
+  // Original query with status filter
+  const patient = await PatientModel.findOne({ _id: id, status: true })
+    .populate('user', 'name email profilePicUrl')
+    .lean()
+    .exec();
+
+  console.log(
+    `Final patient result with status filter: ${
+      patient ? 'Found' : 'Not found'
+    }`,
+  );
+
+  return patient;
+}
+
+async function findByUserId(userId: Types.ObjectId): Promise<Patient | null> {
+  console.log(`Finding patient by User ID: ${userId}`);
+
+  // Check if patient exists with this user ID regardless of status
+  const patientExists = await PatientModel.exists({ user: userId });
+  console.log(`Patient with user ID exists check: ${patientExists}`);
+
+  // Find without status filter
+  const patientWithoutStatus = await PatientModel.findOne({ user: userId })
+    .populate('user', 'name email profilePicUrl')
+    .lean()
+    .exec();
+  console.log(
+    `Patient by user ID without status: ${
+      patientWithoutStatus ? 'Found' : 'Not found'
+    }`,
+  );
+
+  // Original query
+  const patient = await PatientModel.findOne({ user: userId, status: true })
+    .populate('user', 'name email profilePicUrl')
+    .lean()
+    .exec();
+
+  console.log(
+    `Final patient result by user ID: ${patient ? 'Found' : 'Not found'}`,
+  );
+
+  return patient;
+}
+
+async function create(patient: Patient): Promise<Patient> {
+  const now = new Date();
+  patient.createdAt = now;
+  patient.updatedAt = now;
+
+  // Make sure status is explicitly set to true
+  patient.status = true;
+
+  console.log(`Creating patient:`, patient);
+  const created = await PatientModel.create(patient);
+  console.log(`Created patient with ID: ${created._id}`);
+  return created.toObject();
+}
+
+async function update(patient: Patient): Promise<Patient | null> {
+  patient.updatedAt = new Date();
+  console.log(`Updating patient with ID: ${patient._id}`);
+  return PatientModel.findByIdAndUpdate(patient._id, patient, { new: true })
+    .lean()
+    .exec();
+}
+
+export default {
+  findById,
+  findByUserId,
+  create,
+  update,
+};

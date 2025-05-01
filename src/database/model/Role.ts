@@ -12,7 +12,7 @@ export enum RoleCode {
 
 export default interface Role {
   _id: Types.ObjectId;
-  code: string;
+  code: RoleCode;
   status?: boolean;
   createdAt?: Date;
   updatedAt?: Date;
@@ -21,9 +21,10 @@ export default interface Role {
 const schema = new Schema<Role>(
   {
     code: {
-      type: Schema.Types.String,
+      type: String,
       required: true,
       enum: Object.values(RoleCode),
+      unique: true,
     },
     status: {
       type: Schema.Types.Boolean,

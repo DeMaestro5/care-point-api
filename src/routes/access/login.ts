@@ -11,6 +11,7 @@ import asyncHandler from '../../helpers/asyncHandler';
 import bcrypt from 'bcrypt';
 import { getUserData } from './utils';
 import { PublicRequest } from '../../types/app-request';
+import { RoleCode } from '../../database/model/Role';
 
 const router = express.Router();
 
@@ -33,7 +34,10 @@ router.post(
     const userData = await getUserData(user);
 
     new SuccessResponse('Login Success', {
-      user: userData,
+      user: {
+        ...userData,
+        role: user.role,
+      },
       tokens: tokens,
     }).send(res);
   }),

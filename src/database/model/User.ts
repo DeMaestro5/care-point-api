@@ -42,7 +42,7 @@ const schema = new Schema<User>(
       select: false,
     },
     role: {
-      type: Schema.Types.String,
+      type: String,
       enum: Object.values(RoleCode),
       required: true,
     },

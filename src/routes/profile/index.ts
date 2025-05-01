@@ -16,15 +16,12 @@ router.use(authentication);
 /*-------------------------------------------------------------------------*/
 
 router.get(
-  '/my',
+  '/me',
   asyncHandler(async (req: ProtectedRequest, res) => {
-    const user = await UserRepo.findPrivateProfileById(req.user._id);
+    const user = await UserRepo.findById(req.user._id);
     if (!user) throw new BadRequestError('User not registered');
-
-    return new SuccessResponse(
-      'success',
-      _.pick(user, ['name', 'email', 'profilePicUrl', 'roles']),
-    ).send(res);
+    const userData = _.pick(user, ['name', 'email', 'profilePicUrl', 'role']);
+    new SuccessResponse('success', userData).send(res);
   }),
 );
 

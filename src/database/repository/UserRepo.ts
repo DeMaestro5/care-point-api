@@ -14,10 +14,6 @@ async function findPrivateProfileById(
 ): Promise<User | null> {
   return UserModel.findOne({ _id: id, status: true })
     .select('+email')
-    .populate({
-      path: 'role',
-      select: 'code status',
-    })
     .lean<User>()
     .exec();
 }
@@ -26,21 +22,13 @@ async function findPrivateProfileById(
 async function findById(id: Types.ObjectId): Promise<User | null> {
   return UserModel.findOne({ _id: id, status: true })
     .select('+email +password')
-    .populate({
-      path: 'role',
-      select: 'code status',
-    })
     .lean()
     .exec();
 }
 
 async function findByEmail(email: string): Promise<User | null> {
   return UserModel.findOne({ email: email })
-    .select('+email +password')
-    .populate({
-      path: 'role',
-      select: 'code status',
-    })
+    .select('+email +password role name profilePicUrl')
     .lean()
     .exec();
 }
@@ -49,13 +37,17 @@ async function findFieldsById(
   id: Types.ObjectId,
   ...fields: string[]
 ): Promise<User | null> {
-  return UserModel.findOne({ _id: id, status: true }, [...fields])
+  return UserModel.findOne({ _id: id, status: true })
+    .select(fields.join(' '))
     .lean()
     .exec();
 }
 
 async function findPublicProfileById(id: Types.ObjectId): Promise<User | null> {
-  return UserModel.findOne({ _id: id, status: true }).lean().exec();
+  return UserModel.findOne({ _id: id, status: true })
+    .select('name profilePicUrl role')
+    .lean()
+    .exec();
 }
 
 async function create(
@@ -66,18 +58,24 @@ async function create(
 ): Promise<{ user: User; keystore: Keystore }> {
   const now = new Date();
 
+  // Ensure role is properly set as a string enum value
   user.role = roleCode as RoleCode;
+
   user.createdAt = user.updatedAt = now;
-  const createdUser = await UserModel.create(user);
+
+  // Create a plain object for MongoDB to avoid issues with refs
+  const userObj = {
+    ...user,
+    role: roleCode,
+  };
+
+  const createdUser = await UserModel.create(userObj);
   const keystore = await KeystoreRepo.create(
     createdUser,
     accessTokenKey,
     refreshTokenKey,
   );
-  return {
-    user: createdUser.toObject(),
-    keystore: keystore,
-  };
+  return { user: createdUser.toObject(), keystore };
 }
 
 async function update(
@@ -94,7 +92,7 @@ async function update(
     accessTokenKey,
     refreshTokenKey,
   );
-  return { user: user, keystore: keystore };
+  return { user: user, keystore };
 }
 
 async function updateInfo(user: User): Promise<any> {

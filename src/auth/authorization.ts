@@ -3,27 +3,23 @@ import { ProtectedRequest } from 'app-request';
 import { AuthFailureError } from '../core/ApiError';
 import RoleRepo from '../database/repository/RoleRepo';
 import asyncHandler from '../helpers/asyncHandler';
+import { NextFunction, Request, Response } from 'express';
+import { ForbiddenError } from '../core/ApiError';
 
 const router = express.Router();
 
-export default router.use(
-  asyncHandler(async (req: ProtectedRequest, res, next) => {
-    if (!req.user || !req.user.role || !req.currentRoleCodes)
-      throw new AuthFailureError('Permission denied');
+export default (roleCode: string) =>
+  async (req: ProtectedRequest, res: Response, next: NextFunction) => {
+    try {
+      const role = await RoleRepo.findByCode(roleCode);
+      if (!role) throw new ForbiddenError('Permission denied');
 
-    const roles = await RoleRepo.findByCodes(req.currentRoleCodes);
-    if (roles.length === 0) throw new AuthFailureError('Permission denied');
-
-    let authorized = false;
-    for (const role of roles) {
-      if (req.user.role._id.equals(role._id)) {
-        authorized = true;
-        break;
+      if (req.user.role !== roleCode) {
+        throw new ForbiddenError('Permission denied');
       }
+
+      next();
+    } catch (error) {
+      next(error);
     }
-
-    if (!authorized) throw new AuthFailureError('Permission denied');
-
-    return next();
-  }),
-);
+  };
