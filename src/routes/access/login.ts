@@ -33,7 +33,10 @@ router.post(
     const userData = await getUserData(user);
 
     new SuccessResponse('Login Success', {
-      user: userData,
+      user: {
+        ...userData,
+        role: user.role,
+      },
       tokens: tokens,
     }).send(res);
   }),

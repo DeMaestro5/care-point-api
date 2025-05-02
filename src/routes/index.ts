@@ -6,8 +6,11 @@ import signup from './access/signup';
 import login from './access/login';
 import logout from './access/logout';
 import token from './access/token';
-import credential from './access/credential';
-import profile from './profile';
+import resetPassword from './access/reset-password';
+import patientRoutes from './patient';
+import doctorRoutes from './doctor';
+import ambulanceRoutes from './ambulance';
+import pharmacyRoutes from './pharmacy';
 
 const router = express.Router();
 
@@ -17,11 +20,14 @@ router.use(apikey);
 /*---------------------------------------------------------*/
 router.use(permission(Permission.GENERAL));
 /*---------------------------------------------------------*/
-router.use('/signup', signup);
-router.use('/login', login);
-router.use('/logout', logout);
-router.use('/token', token);
-router.use('/credential', credential);
-router.use('/profile', profile);
+router.use('/api/v1/signup', signup);
+router.use('/api/v1/login', login);
+router.use('/api/v1/logout', logout);
+router.use('/api/v1/token', token);
+router.use('/api/v1/reset-password', resetPassword);
+router.use('/api/v1/patients', patientRoutes);
+router.use('/api/v1/doctors', doctorRoutes);
+router.use('/api/v1/ambulances', ambulanceRoutes);
+router.use('/api/v1/pharmacies', pharmacyRoutes);
 
 export default router;
