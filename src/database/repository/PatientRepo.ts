@@ -88,9 +88,55 @@ async function update(patient: Patient): Promise<Patient | null> {
     .exec();
 }
 
+async function logAccess(
+  patientId: Types.ObjectId,
+  userId: Types.ObjectId,
+  action: string,
+): Promise<void> {
+  await PatientModel.updateOne(
+    { _id: patientId },
+    { $push: { accessLogs: { userId, action, timestamp: new Date() } } },
+  );
+}
+
+async function addMedicalHistory(patientId: Types.ObjectId, entry: any) {
+  return PatientModel.findByIdAndUpdate(
+    patientId,
+    { $push: { medicalHistory: entry } },
+    { new: true },
+  )
+    .lean()
+    .exec();
+}
+
+async function updateMedicalHistoryEntry(
+  patientId: Types.ObjectId,
+  entryId: Types.ObjectId,
+  update: any,
+) {
+  return PatientModel.findOneAndUpdate(
+    { _id: patientId, 'medicalHistory.entryId': entryId },
+    { $set: { 'medicalHistory.$': update } },
+    { new: true },
+  )
+    .lean()
+    .exec();
+}
+
+async function getMedicalHistory(patientId: Types.ObjectId) {
+  return PatientModel.findById(patientId)
+    .select('medicalHistory')
+    .lean()
+    .exec();
+}
+
 export default {
   findById,
   findByUserId,
   create,
   update,
+  logAccess,
+  addMedicalHistory,
+  updateMedicalHistoryEntry,
+  getMedicalHistory,
 };

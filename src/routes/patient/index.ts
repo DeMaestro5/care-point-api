@@ -2,18 +2,20 @@ import express from 'express';
 import { SuccessResponse } from '../../core/ApiResponse';
 import PatientRepo from '../../database/repository/PatientRepo';
 import { ProtectedRequest } from 'app-request';
-import { BadRequestError } from '../../core/ApiError';
+import { BadRequestError, ForbiddenError } from '../../core/ApiError';
 import validator from '../../helpers/validator';
 import schema from './schema';
 import asyncHandler from '../../helpers/asyncHandler';
 import authentication from '../../auth/authentication';
 import { Types } from 'mongoose';
+import medicalHistoryRouter from './medicalHistory';
 
 const router = express.Router();
 
 /*-------------------------------------------------------------------------*/
 router.use(authentication);
 /*-------------------------------------------------------------------------*/
+router.use('/:patientId/medical-history', medicalHistoryRouter);
 
 router.get(
   '/:id',
@@ -53,6 +55,13 @@ router.get(
       console.log('Patient search result:', patient ? 'Found' : 'Not found');
 
       if (!patient) throw new BadRequestError('Patient not found');
+      console.log('patient.user:', patient.user, 'req.user._id:', req.user._id);
+      console.log(
+        'patient.user.toString():',
+        patient.user.toString(),
+        'req.user._id.toString():',
+        req.user._id.toString(),
+      );
       new SuccessResponse('success', patient).send(res);
     } catch (error) {
       console.error('Error in patient lookup:', error);
@@ -111,6 +120,81 @@ router.get(
       console.error('Error in patient profile lookup:', error);
       throw error;
     }
+  }),
+);
+
+// Update patient profile with field-level permissions
+router.put(
+  '/:id',
+  validator(schema.updatePatient),
+  asyncHandler(async (req: ProtectedRequest, res) => {
+    if (!Types.ObjectId.isValid(req.params.id)) {
+      throw new BadRequestError('Invalid patient ID format');
+    }
+
+    const patientId = new Types.ObjectId(req.params.id);
+
+    // Check if patient exists
+    const patient = await PatientRepo.findById(patientId);
+    if (!patient) {
+      throw new BadRequestError('Patient not found');
+    }
+
+    // Check authorization: only the patient or doctors can access the profile
+    const isPatientOwner = patient.user._id
+      ? patient.user._id.toString() === req.user._id.toString()
+      : patient.user.toString() === req.user._id.toString();
+    const isDoctor = req.user.role === 'DOCTOR';
+
+    if (!isPatientOwner && !isDoctor) {
+      throw new ForbiddenError('Not authorized to access this patient profile');
+    }
+
+    // Field-level permission control
+    const updateData: any = {};
+    const fieldsPatientCanUpdate = ['height', 'weight', 'allergies'];
+    const fieldsOnlyDoctorCanUpdate = ['bloodGroup'];
+
+    // Process each field in the request body
+    Object.keys(req.body).forEach((field) => {
+      // Fields any authenticated & authorized user can update
+      if (fieldsPatientCanUpdate.includes(field)) {
+        updateData[field] = req.body[field];
+      }
+      // Fields only doctors can update
+      else if (fieldsOnlyDoctorCanUpdate.includes(field)) {
+        if (isDoctor) {
+          updateData[field] = req.body[field];
+        } else {
+          // We don't throw here to allow partial updates - just silently ignore fields the user can't update
+          console.log(`Field ${field} requires doctor privileges, skipping`);
+        }
+      }
+      // All other fields - apply standard permission check
+      else {
+        updateData[field] = req.body[field];
+      }
+    });
+
+    // Include the ID and user reference
+    updateData._id = patientId;
+    updateData.user = patient.user;
+
+    // Add metadata for audit trail
+    updateData.updatedBy = req.user._id;
+    updateData.updatedAt = new Date();
+
+    // Update patient profile with processed fields
+    const updatedPatient = await PatientRepo.update(updateData);
+
+    if (!updatedPatient) {
+      throw new BadRequestError('Failed to update patient profile');
+    }
+
+    new SuccessResponse(
+      'Patient profile updated successfully',
+      updatedPatient,
+    ).send(res);
   }),
 );
 

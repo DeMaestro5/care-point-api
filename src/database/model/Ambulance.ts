@@ -6,10 +6,25 @@ export const COLLECTION_NAME = 'ambulances';
 export default interface Ambulance {
   _id: Types.ObjectId;
   user: Types.ObjectId;
-  vehicleNumber?: string;
-  vehicleType?: string;
-  equipment?: string[];
-  crewMembers?: number;
+  vehicleNumbers?: string[];
+  vehicleTypes?: string[];
+  vehicleCount?: number;
+  equipments?: string[];
+  crewMembers?: {
+    name: string;
+    role: string;
+    experience: string;
+  }[];
+  serviceArea?: string[];
+  contactNumber?: string;
+  operatingHours?: string[];
+  baseLocation?: {
+    address: string;
+    coordinates: {
+      latitude: number;
+      longitude: number;
+    };
+  };
   status?: boolean;
   createdAt?: Date;
   updatedAt?: Date;
@@ -22,20 +37,60 @@ const schema = new Schema<Ambulance>(
       ref: 'User',
       required: true,
     },
-    vehicleNumber: {
-      type: Schema.Types.String,
-      unique: true,
+    vehicleNumbers: [
+      {
+        type: Schema.Types.String,
+        unique: true,
+      },
+    ],
+    vehicleTypes: {
+      type: [Schema.Types.String],
     },
-    vehicleType: {
-      type: Schema.Types.String,
+    vehicleCount: {
+      type: Schema.Types.Number,
     },
-    equipment: [
+    equipments: [
       {
         type: Schema.Types.String,
       },
     ],
-    crewMembers: {
-      type: Schema.Types.Number,
+    crewMembers: [
+      {
+        name: {
+          type: Schema.Types.String,
+          required: true,
+        },
+        role: {
+          type: Schema.Types.String,
+          required: true,
+        },
+        experience: {
+          type: Schema.Types.String,
+          required: true,
+        },
+      },
+    ],
+    serviceArea: {
+      type: [Schema.Types.String],
+    },
+    contactNumber: {
+      type: Schema.Types.String,
+    },
+    operatingHours: {
+      type: [Schema.Types.String],
+    },
+    baseLocation: {
+      address: {
+        type: Schema.Types.String,
+      },
+      coordinates: {
+        latitude: {
+          type: Schema.Types.Number,
+        },
+        longitude: {
+          type: Schema.Types.Number,
+        },
+      },
     },
     status: {
       type: Schema.Types.Boolean,

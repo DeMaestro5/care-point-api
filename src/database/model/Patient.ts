@@ -1,4 +1,5 @@
 import { Schema, model, Types } from 'mongoose';
+import MedicalHistorySchema from './MedicalHistory';
 
 export const DOCUMENT_NAME = 'Patient';
 export const COLLECTION_NAME = 'patients';
@@ -12,7 +13,27 @@ export default interface Patient {
   height?: number;
   weight?: number;
   allergies?: string[];
-  medicalHistory?: string[];
+  emergencyContact?: {
+    name: string;
+    phone: string;
+    relationship: string;
+  };
+  medicalHistory?: Array<{
+    entryId: Types.ObjectId;
+    condition: string;
+    diagnosis: string;
+    treatment: string;
+    date: Date;
+    addedBy: Types.ObjectId;
+    addedAt: Date;
+    updatedBy?: Types.ObjectId;
+    updatedAt?: Date;
+  }>;
+  accessLogs?: Array<{
+    userId: Types.ObjectId;
+    action: string;
+    timestamp: Date;
+  }>;
   status?: boolean;
   createdAt?: Date;
   updatedAt?: Date;
@@ -47,9 +68,17 @@ const schema = new Schema<Patient>(
         type: Schema.Types.String,
       },
     ],
-    medicalHistory: [
+    emergencyContact: {
+      name: { type: Schema.Types.String, required: true },
+      phone: { type: Schema.Types.String, required: true },
+      relationship: { type: Schema.Types.String, required: true },
+    },
+    medicalHistory: [MedicalHistorySchema],
+    accessLogs: [
       {
-        type: Schema.Types.String,
+        userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+        action: { type: Schema.Types.String, required: true },
+        timestamp: { type: Schema.Types.Date, required: true },
       },
     ],
     status: {

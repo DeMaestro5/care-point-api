@@ -10,7 +10,14 @@ export default interface Pharmacy {
   address?: string;
   phoneNumber?: string;
   workingHours?: string;
+  services?: string[];
   status?: boolean;
+  hasInsuranceSupport?: boolean;
+  acceptedInsuranceProviders?: string[];
+  coordinates?: {
+    latitude: number;
+    longitude: number;
+  };
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -34,6 +41,24 @@ const schema = new Schema<Pharmacy>(
     },
     workingHours: {
       type: Schema.Types.String,
+    },
+    services: {
+      type: [Schema.Types.String],
+    },
+    hasInsuranceSupport: {
+      type: Schema.Types.Boolean,
+      default: false,
+    },
+    acceptedInsuranceProviders: {
+      type: [Schema.Types.String],
+    },
+    coordinates: {
+      latitude: {
+        type: Schema.Types.Number,
+      },
+      longitude: {
+        type: Schema.Types.Number,
+      },
     },
     status: {
       type: Schema.Types.Boolean,
