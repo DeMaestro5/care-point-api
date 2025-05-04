@@ -27,4 +27,19 @@ export default {
     date: Joi.date().required(),
     notes: Joi.string().optional(),
   }),
+  prescription: Joi.object().keys({
+    medications: Joi.array()
+      .items(
+        Joi.object({
+          name: Joi.string().required(),
+          dosage: Joi.string().required(),
+          frequency: Joi.string().required(),
+          duration: Joi.string().required(),
+          instructions: Joi.string().optional(),
+        }),
+      )
+      .required(),
+    diagnosis: Joi.string().optional(),
+    notes: Joi.string().optional(),
+  }),
 };
