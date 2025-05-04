@@ -9,6 +9,7 @@ import asyncHandler from '../../helpers/asyncHandler';
 import authentication from '../../auth/authentication';
 import { Types } from 'mongoose';
 import medicalHistoryRouter from './medicalHistory';
+import prescriptionsRouter from './prescriptions';
 
 const router = express.Router();
 
@@ -16,6 +17,7 @@ const router = express.Router();
 router.use(authentication);
 /*-------------------------------------------------------------------------*/
 router.use('/:patientId/medical-history', medicalHistoryRouter);
+router.use('/:patientId/prescriptions', prescriptionsRouter);
 
 router.get(
   '/:id',
