@@ -7,20 +7,18 @@ import asyncHandler from '../../helpers/asyncHandler';
 import validator from '../../helpers/validator';
 import schema from './schema';
 import { SuccessResponse } from '../../core/ApiResponse';
+import doctorAuth from '../../auth/doctorAuth';
 
 const router = express.Router({ mergeParams: true });
 
 // Add medical history entry (Doctors only)
-
 router.post(
   '/',
   validator(schema.medicalHistory),
+  doctorAuth,
   asyncHandler(async (req: ProtectedRequest, res) => {
     if (!Types.ObjectId.isValid(req.params.patientId)) {
       throw new BadRequestError('Invalid patient ID format');
-    }
-    if (req.user.role !== 'DOCTOR') {
-      throw new ForbiddenError('Only doctors can add medical history entries');
     }
     const patientId = new Types.ObjectId(req.params.patientId);
     const newEntry = {
@@ -43,15 +41,13 @@ router.post(
 router.put(
   '/:entryId',
   validator(schema.medicalHistory),
+  doctorAuth,
   asyncHandler(async (req: ProtectedRequest, res) => {
     if (
       !Types.ObjectId.isValid(req.params.patientId) ||
       !Types.ObjectId.isValid(req.params.entryId)
     ) {
       throw new BadRequestError('Invalid ID format');
-    }
-    if (req.user.role !== 'DOCTOR') {
-      throw new ForbiddenError('Only doctors can edit medical history entries');
     }
     const patientId = new Types.ObjectId(req.params.patientId);
     const entryId = new Types.ObjectId(req.params.entryId);
@@ -132,4 +128,5 @@ router.get(
     }).send(res);
   }),
 );
+
 export default router;
