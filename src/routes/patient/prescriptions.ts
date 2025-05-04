@@ -59,4 +59,47 @@ router.post(
   }),
 );
 
+router.get(
+  '/:prescriptionId',
+  asyncHandler(async (req: ProtectedRequest, res: Response) => {
+    const prescriptionId = new Types.ObjectId(req.params.prescriptionId);
+    const prescription = await PrescriptionRepo.findById(prescriptionId);
+    if (!prescription) {
+      return new NotFoundResponse('Prescription not found').send(res);
+    }
+
+    return new SuccessResponse(
+      'Prescription retrieved successfully',
+      prescription,
+    ).send(res);
+  }),
+);
+
+router.put(
+  '/:prescriptionId',
+  validator(schema.prescription),
+  asyncHandler(async (req: ProtectedRequest, res: Response) => {
+    // Check if user is a doctor
+    if (req.user.role !== 'DOCTOR') {
+      return new ForbiddenResponse(
+        'Only doctors can update prescriptions',
+      ).send(res);
+    }
+    const prescriptionId = new Types.ObjectId(req.params.prescriptionId);
+    const doctorId = new Types.ObjectId(req.user._id);
+    const prescription = await PrescriptionRepo.update(prescriptionId, {
+      ...req.body,
+      doctor: doctorId,
+    });
+    if (!prescription) {
+      return new NotFoundResponse('Prescription not found').send(res);
+    }
+
+    return new SuccessResponse(
+      'Prescription updated successfully',
+      prescription,
+    ).send(res);
+  }),
+);
+
 export default router;
