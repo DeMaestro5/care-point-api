@@ -58,4 +58,10 @@ export default {
     reason: Joi.string().trim().optional(),
     notes: Joi.string().trim().optional(),
   }),
+  medicalRecord: Joi.object().keys({
+    diagnosis: Joi.string().required().min(3),
+    treatment: Joi.string().required().min(3),
+    notes: Joi.string().optional(),
+    attachments: Joi.array().items(Joi.string()).optional(),
+  }),
 };
