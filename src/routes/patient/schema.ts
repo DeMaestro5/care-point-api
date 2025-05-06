@@ -64,4 +64,7 @@ export default {
     notes: Joi.string().optional(),
     attachments: Joi.array().items(Joi.string()).optional(),
   }),
+  updateAllergies: Joi.object().keys({
+    allergies: Joi.array().items(Joi.string()).required(),
+  }),
 };
