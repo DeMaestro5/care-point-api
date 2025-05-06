@@ -11,6 +11,7 @@ import { Types } from 'mongoose';
 import medicalHistoryRouter from './medicalHistory';
 import prescriptionsRouter from './prescriptions';
 import appointmentsRouter from './appointments';
+import medicalRecordsRouter from './medicalRecords';
 
 const router = express.Router();
 
@@ -23,6 +24,7 @@ router.use(authentication);
 router.use('/:patientId/medical-history', medicalHistoryRouter);
 router.use('/:patientId/prescriptions', prescriptionsRouter);
 router.use('/:patientId/appointments', appointmentsRouter);
+router.use('/:patientId/medical-records', medicalRecordsRouter);
 
 router.get(
   '/:id',

@@ -50,9 +50,6 @@ router.post(
   validator(schema.appointment),
   asyncHandler(async (req: ProtectedRequest, res) => {
     try {
-      console.log('Create appointment request body:', req.body);
-      console.log('Create appointment params:', req.params);
-
       const patientId = new Types.ObjectId(req.params.patientId);
       const doctorId = new Types.ObjectId(req.user._id);
 
@@ -63,7 +60,6 @@ router.post(
         status: 'scheduled', // Default status for new appointments
       };
 
-      console.log('Creating appointment with data:', appointmentData);
       const appointment = await AppointmentRepo.create(appointmentData);
 
       return new SuccessResponse('Appointment created successfully', {
@@ -124,7 +120,6 @@ router.put(
           const refreshedAppointment =
             await AppointmentRepo.findById(appointmentId);
           if (refreshedAppointment) {
-            console.log('Refreshed appointment:', refreshedAppointment);
             existingAppointment.patient = refreshedAppointment.patient;
             existingAppointment.doctor = refreshedAppointment.doctor;
           }
