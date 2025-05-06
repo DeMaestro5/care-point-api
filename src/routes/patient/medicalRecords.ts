@@ -8,6 +8,8 @@ import validator from '../../helpers/validator';
 import schema from './schema';
 import MedicalRecordRepo from '../../database/repository/MedicalRecordRepo';
 import doctorAuth from '../../auth/doctorAuth';
+import type MedicalRecord from '../../database/model/MedicalRecord';
+import { MedicalRecordModel } from '../../database/model/MedicalRecord';
 
 const router = express.Router({ mergeParams: true });
 
@@ -90,12 +92,14 @@ router.post(
 
 // Update a medical record (doctors only)
 router.put(
-  '/:recordId',
+  '/:medicalRecordId',
   doctorAuth,
   validator(schema.medicalRecord),
   asyncHandler(async (req: ProtectedRequest, res) => {
     try {
-      const recordId = new Types.ObjectId(req.params.recordId);
+      const recordId = new Types.ObjectId(req.params.medicalRecordId);
+      const doctorId = new Types.ObjectId(req.user._id);
+      const patientId = new Types.ObjectId(req.params.patientId);
 
       // First fetch the existing record
       const existingRecord = await MedicalRecordRepo.findById(recordId);
@@ -104,15 +108,65 @@ router.put(
         throw new NotFoundResponse('Medical record not found');
       }
 
-      // Only update fields that are provided
-      const updateData = {
-        ...(req.body.diagnosis && { diagnosis: req.body.diagnosis }),
-        ...(req.body.treatment && { treatment: req.body.treatment }),
-        ...(req.body.notes !== undefined && { notes: req.body.notes }),
-        ...(req.body.attachments !== undefined && {
-          attachments: req.body.attachments,
-        }),
+      // Check if the record belongs to the correct patient
+      if (existingRecord.patient.toString() !== patientId.toString()) {
+        throw new ForbiddenError(
+          'Medical record does not belong to this patient',
+        );
+      }
+
+      // Check if the record has valid references
+      if (!existingRecord.patient || !existingRecord.createdBy) {
+        // This is a recovery path for records with missing references
+        const fixedRecord = await MedicalRecordModel.findByIdAndUpdate(
+          recordId,
+          {
+            $set: {
+              patient: patientId,
+              createdBy: doctorId,
+            },
+          },
+          { new: true },
+        ).exec();
+
+        if (fixedRecord) {
+          // Re-fetch the record
+          const refreshedRecord = await MedicalRecordRepo.findById(recordId);
+          if (refreshedRecord) {
+            existingRecord.patient = refreshedRecord.patient;
+            existingRecord.createdBy = refreshedRecord.createdBy;
+          }
+        }
+      }
+
+      // Get the patient ID from the record
+      let recordPatientId = existingRecord.patient;
+
+      // If reference is missing, use the ID from the request
+      if (!recordPatientId) {
+        recordPatientId = patientId;
+      }
+
+      // Handle the update data
+      const updateData: Partial<MedicalRecord> = {
+        // Ensure we always have valid references
+        patient: recordPatientId,
+        createdBy: existingRecord.createdBy || doctorId,
       };
+
+      // Only update fields that are provided
+      if (req.body.diagnosis) {
+        updateData.diagnosis = req.body.diagnosis;
+      }
+      if (req.body.treatment) {
+        updateData.treatment = req.body.treatment;
+      }
+      if (req.body.notes !== undefined) {
+        updateData.notes = req.body.notes;
+      }
+      if (req.body.attachments !== undefined) {
+        updateData.attachments = req.body.attachments;
+      }
 
       const updatedRecord = await MedicalRecordRepo.update(
         recordId,
@@ -124,7 +178,11 @@ router.put(
       }
 
       return new SuccessResponse('Medical record updated successfully', {
-        record: updatedRecord,
+        record: {
+          ...updatedRecord,
+          patient: { _id: recordPatientId },
+          createdBy: { _id: updatedRecord.createdBy || doctorId },
+        },
       }).send(res);
     } catch (error) {
       console.error('Error updating medical record:', error);
