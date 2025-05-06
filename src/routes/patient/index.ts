@@ -10,14 +10,19 @@ import authentication from '../../auth/authentication';
 import { Types } from 'mongoose';
 import medicalHistoryRouter from './medicalHistory';
 import prescriptionsRouter from './prescriptions';
+import appointmentsRouter from './appointments';
 
 const router = express.Router();
 
 /*-------------------------------------------------------------------------*/
-router.use(authentication);
+// Below all routes require authenticated user
 /*-------------------------------------------------------------------------*/
+router.use(authentication);
+
+// Mount sub-routers
 router.use('/:patientId/medical-history', medicalHistoryRouter);
 router.use('/:patientId/prescriptions', prescriptionsRouter);
+router.use('/:patientId/appointments', appointmentsRouter);
 
 router.get(
   '/:id',

@@ -14,12 +14,10 @@ router.get(
   '/',
   asyncHandler(async (req: ProtectedRequest, res: Response) => {
     const patientId = new Types.ObjectId(req.params.patientId);
-
     const prescriptions = await PrescriptionRepo.findByPatientId(patientId);
     if (prescriptions.length === 0) {
       return new NotFoundResponse('No prescriptions found').send(res);
     }
-
     return new SuccessResponse(
       'Prescriptions retrieved successfully',
       prescriptions,

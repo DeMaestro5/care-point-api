@@ -42,4 +42,20 @@ export default {
     diagnosis: Joi.string().optional(),
     notes: Joi.string().optional(),
   }),
+  appointment: Joi.object().keys({
+    appointmentDate: Joi.date().required(),
+    status: Joi.string()
+      .valid('scheduled', 'completed', 'cancelled', 'rescheduled')
+      .default('scheduled'),
+    reason: Joi.string().required().trim(),
+    notes: Joi.string().trim().optional(),
+  }),
+  updateAppointment: Joi.object().keys({
+    appointmentDate: Joi.date().optional(),
+    status: Joi.string()
+      .valid('scheduled', 'completed', 'cancelled', 'rescheduled')
+      .optional(),
+    reason: Joi.string().trim().optional(),
+    notes: Joi.string().trim().optional(),
+  }),
 };
