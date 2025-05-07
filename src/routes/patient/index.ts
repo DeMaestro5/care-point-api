@@ -14,6 +14,8 @@ import appointmentsRouter from './appointments';
 import medicalRecordsRouter from './medicalRecords';
 import allergiesRouter from './allergies';
 import insuranceRouter from './insurance';
+import paymentsRouter from './payments';
+import familyMembersRouter from './family-members';
 
 const router = express.Router();
 
@@ -29,6 +31,8 @@ router.use('/:patientId/appointments', appointmentsRouter);
 router.use('/:patientId/medical-records', medicalRecordsRouter);
 router.use('/:patientId/allergies', allergiesRouter);
 router.use('/:patientId/insurance', insuranceRouter);
+router.use('/:patientId/payments', paymentsRouter);
+router.use('/:patientId/family-members', familyMembersRouter);
 
 router.get(
   '/:id',
