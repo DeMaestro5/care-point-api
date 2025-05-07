@@ -80,10 +80,26 @@ async function create(patient: Patient): Promise<Patient> {
   return created.toObject();
 }
 
-async function update(patient: Patient): Promise<Patient | null> {
-  patient.updatedAt = new Date();
+// Modified update function for PatientRepo.ts
+
+async function update(patient: Partial<Patient>): Promise<Patient | null> {
   console.log(`Updating patient with ID: ${patient._id}`);
-  return PatientModel.findByIdAndUpdate(patient._id, patient, { new: true })
+
+  // Use $set operator to update only the specified fields
+  // This prevents overwriting other fields that might be required
+  return PatientModel.findByIdAndUpdate(
+    patient._id,
+    {
+      $set: {
+        allergies: patient.allergies,
+        updatedAt: new Date(),
+      },
+    },
+    {
+      new: true,
+      runValidators: true,
+    },
+  )
     .lean()
     .exec();
 }

@@ -64,4 +64,19 @@ export default {
     notes: Joi.string().optional(),
     attachments: Joi.array().items(Joi.string()).optional(),
   }),
+  updateAllergies: Joi.object().keys({
+    allergies: Joi.array().items(Joi.string()).required(),
+  }),
+  insurance: Joi.object().keys({
+    provider: Joi.string().required(),
+    policyNumber: Joi.string().required(),
+    groupNumber: Joi.string().optional(),
+    coverageType: Joi.string()
+      .valid('PRIMARY', 'SECONDARY', 'TERTIARY')
+      .required(),
+    startDate: Joi.date().required(),
+    endDate: Joi.date().optional(),
+    isActive: Joi.boolean().default(true),
+    notes: Joi.string().optional(),
+  }),
 };
