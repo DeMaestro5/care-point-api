@@ -13,6 +13,7 @@ import prescriptionsRouter from './prescriptions';
 import appointmentsRouter from './appointments';
 import medicalRecordsRouter from './medicalRecords';
 import allergiesRouter from './allergies';
+import insuranceRouter from './insurance';
 
 const router = express.Router();
 
@@ -27,6 +28,7 @@ router.use('/:patientId/prescriptions', prescriptionsRouter);
 router.use('/:patientId/appointments', appointmentsRouter);
 router.use('/:patientId/medical-records', medicalRecordsRouter);
 router.use('/:patientId/allergies', allergiesRouter);
+router.use('/:patientId/insurance', insuranceRouter);
 
 router.get(
   '/:id',
