@@ -146,6 +146,13 @@ async function getMedicalHistory(patientId: Types.ObjectId) {
     .exec();
 }
 
+async function findByDoctorId(doctorId: Types.ObjectId): Promise<Patient[]> {
+  return PatientModel.find({ doctor: doctorId, status: true })
+    .populate('user', 'name email profilePicUrl')
+    .lean()
+    .exec();
+}
+
 export default {
   findById,
   findByUserId,
@@ -155,4 +162,5 @@ export default {
   addMedicalHistory,
   updateMedicalHistoryEntry,
   getMedicalHistory,
+  findByDoctorId,
 };

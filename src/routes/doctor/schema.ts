@@ -11,4 +11,37 @@ export default {
     status: Joi.boolean(),
     search: Joi.string().trim(),
   }),
+  updateDoctor: Joi.object().keys({
+    specialization: Joi.string().trim(),
+    licenseNumber: Joi.string().trim(),
+    consultationFee: Joi.number().min(0),
+    yearsOfExperience: Joi.number().min(0),
+    availability: Joi.object().keys({
+      monday: Joi.array().items(Joi.string()),
+      tuesday: Joi.array().items(Joi.string()),
+      wednesday: Joi.array().items(Joi.string()),
+      thursday: Joi.array().items(Joi.string()),
+      friday: Joi.array().items(Joi.string()),
+      saturday: Joi.array().items(Joi.string()),
+      sunday: Joi.array().items(Joi.string()),
+    }),
+    education: Joi.array().items(Joi.string()),
+    qualification: Joi.string().trim(),
+    certifications: Joi.array().items(Joi.string()),
+    status: Joi.boolean(),
+    hospital: Joi.string().trim(),
+  }),
+  updateAvailability: Joi.object().keys({
+    availability: Joi.object()
+      .keys({
+        monday: Joi.array().items(Joi.string()),
+        tuesday: Joi.array().items(Joi.string()),
+        wednesday: Joi.array().items(Joi.string()),
+        thursday: Joi.array().items(Joi.string()),
+        friday: Joi.array().items(Joi.string()),
+        saturday: Joi.array().items(Joi.string()),
+        sunday: Joi.array().items(Joi.string()),
+      })
+      .required(),
+  }),
 };
