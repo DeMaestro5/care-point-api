@@ -31,4 +31,17 @@ export default {
     status: Joi.boolean(),
     hospital: Joi.string().trim(),
   }),
+  updateAvailability: Joi.object().keys({
+    availability: Joi.object()
+      .keys({
+        monday: Joi.array().items(Joi.string()),
+        tuesday: Joi.array().items(Joi.string()),
+        wednesday: Joi.array().items(Joi.string()),
+        thursday: Joi.array().items(Joi.string()),
+        friday: Joi.array().items(Joi.string()),
+        saturday: Joi.array().items(Joi.string()),
+        sunday: Joi.array().items(Joi.string()),
+      })
+      .required(),
+  }),
 };

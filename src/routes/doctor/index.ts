@@ -8,6 +8,7 @@ import schema from './schema';
 import asyncHandler from '../../helpers/asyncHandler';
 import authentication from '../../auth/authentication';
 import { Types } from 'mongoose';
+import availabilityRouter from './availability';
 
 const router = express.Router();
 
@@ -15,9 +16,11 @@ const router = express.Router();
 router.use(authentication);
 /*-------------------------------------------------------------------------*/
 
+router.use('/:doctorId/availability', availabilityRouter);
+
 router.get(
   '/',
-  validator(schema.searchDoctors, ValidationSource.QUERY),
+  validator(schema.searchDoctors),
   asyncHandler(async (req: ProtectedRequest, res) => {
     const { page, limit, specialization, status, search } = req.query;
     const result = await DoctorRepo.searchDoctors({
