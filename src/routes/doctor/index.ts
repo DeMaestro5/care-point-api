@@ -16,8 +16,24 @@ router.use(authentication);
 /*-------------------------------------------------------------------------*/
 
 router.get(
+  '/',
+  validator(schema.searchDoctors),
+  asyncHandler(async (req: ProtectedRequest, res) => {
+    const { page, limit, specialization, status, search } = req.query;
+    const result = await DoctorRepo.searchDoctors({
+      page: Number(page),
+      limit: Number(limit),
+      specialization: specialization as string,
+      status: status === 'true' ? true : status === 'false' ? false : undefined,
+      search: search as string,
+    });
+
+    new SuccessResponse('success', result).send(res);
+  }),
+);
+
+router.get(
   '/:id',
-  validator(schema.doctorId),
   asyncHandler(async (req: ProtectedRequest, res) => {
     const doctor = await DoctorRepo.findById(new Types.ObjectId(req.params.id));
     if (!doctor) throw new BadRequestError('Doctor not found');
