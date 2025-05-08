@@ -30,9 +30,61 @@ async function update(doctor: Doctor): Promise<Doctor | null> {
     .exec();
 }
 
+async function searchDoctors({
+  page = 1,
+  limit = 10,
+  specialization,
+  status,
+  search,
+}: {
+  page?: number;
+  limit?: number;
+  specialization?: string;
+  status?: boolean;
+  search?: string;
+}) {
+  const query: any = { status: true };
+
+  if (specialization) {
+    query.specialization = { $regex: specialization, $options: 'i' };
+  }
+
+  if (typeof status === 'boolean') {
+    query.status = status;
+  }
+
+  if (search) {
+    query.$or = [
+      { specialization: { $regex: search, $options: 'i' } },
+      { hospital: { $regex: search, $options: 'i' } },
+      { qualification: { $regex: search, $options: 'i' } },
+    ];
+  }
+
+  const [doctors, total] = await Promise.all([
+    DoctorModel.find(query)
+      .populate('user', 'name email profilePicUrl')
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .lean()
+      .exec(),
+    DoctorModel.countDocuments(query),
+  ]);
+
+  return {
+    doctors,
+    total,
+    page,
+    totalPages: Math.ceil(total / limit),
+    hasMore: page * limit < total,
+  };
+}
+
 export default {
   findById,
   findByUserId,
   create,
   update,
+  searchDoctors,
 };
