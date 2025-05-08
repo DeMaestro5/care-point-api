@@ -9,6 +9,7 @@ import asyncHandler from '../../helpers/asyncHandler';
 import authentication from '../../auth/authentication';
 import { Types } from 'mongoose';
 import availabilityRouter from './availability';
+import appointmentsRouter from './appointments';
 
 const router = express.Router();
 
@@ -17,6 +18,7 @@ router.use(authentication);
 /*-------------------------------------------------------------------------*/
 
 router.use('/:doctorId/availability', availabilityRouter);
+router.use('/:doctorId/appointments', appointmentsRouter);
 
 router.get(
   '/',
