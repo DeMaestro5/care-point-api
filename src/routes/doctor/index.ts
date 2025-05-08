@@ -10,6 +10,7 @@ import authentication from '../../auth/authentication';
 import { Types } from 'mongoose';
 import availabilityRouter from './availability';
 import appointmentsRouter from './appointments';
+import patientsRouter from './patients';
 
 const router = express.Router();
 
@@ -19,6 +20,7 @@ router.use(authentication);
 
 router.use('/:doctorId/availability', availabilityRouter);
 router.use('/:doctorId/appointments', appointmentsRouter);
+router.use('/:doctorId/patients', patientsRouter);
 
 router.get(
   '/',
