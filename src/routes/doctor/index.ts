@@ -11,7 +11,7 @@ import { Types } from 'mongoose';
 import availabilityRouter from './availability';
 import appointmentsRouter from './appointments';
 import patientsRouter from './patients';
-
+import reviewsRouter from './reviews';
 const router = express.Router();
 
 /*-------------------------------------------------------------------------*/
@@ -21,6 +21,7 @@ router.use(authentication);
 router.use('/:doctorId/availability', availabilityRouter);
 router.use('/:doctorId/appointments', appointmentsRouter);
 router.use('/:doctorId/patients', patientsRouter);
+router.use('/:doctorId/reviews', reviewsRouter);
 
 router.get(
   '/',
