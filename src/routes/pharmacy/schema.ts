@@ -40,4 +40,16 @@ export default {
     batchNumber: Joi.string(),
     manufacturer: Joi.string(),
   }),
+
+  updateInventory: Joi.object({
+    name: Joi.string(),
+    description: Joi.string(),
+    category: Joi.string(),
+    quantity: Joi.number().min(0),
+    unit: Joi.string(),
+    price: Joi.number().min(0),
+    expiryDate: Joi.date(),
+    batchNumber: Joi.string(),
+    manufacturer: Joi.string(),
+  }),
 };

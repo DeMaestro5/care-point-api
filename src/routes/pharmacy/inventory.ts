@@ -63,4 +63,62 @@ router.post(
   }),
 );
 
+router.put(
+  '/:itemId',
+  validator(schema.updateInventory),
+  asyncHandler(async (req: ProtectedRequest, res) => {
+    const pharmacyId = new Types.ObjectId(req.params.pharmacyId);
+    const itemId = new Types.ObjectId(req.params.itemId);
+
+    // Verify pharmacy exists
+    const pharmacy = await PharmacyRepo.findById(pharmacyId);
+    if (!pharmacy) throw new BadRequestError('Pharmacy not found');
+
+    // Verify inventory item exists and belongs to pharmacy
+    const inventory = await InventoryRepo.findById(itemId);
+    if (!inventory) throw new BadRequestError('Inventory item not found');
+    if (!inventory.pharmacy.equals(pharmacyId)) {
+      throw new BadRequestError(
+        'Inventory item does not belong to this pharmacy',
+      );
+    }
+
+    const updatedInventory = await InventoryRepo.update({
+      ...inventory,
+      ...req.body,
+      _id: itemId,
+    });
+
+    new SuccessResponse(
+      'Inventory item updated successfully',
+      updatedInventory,
+    ).send(res);
+  }),
+);
+
+router.delete(
+  '/:itemId',
+  asyncHandler(async (req: ProtectedRequest, res) => {
+    const pharmacyId = new Types.ObjectId(req.params.pharmacyId);
+    const itemId = new Types.ObjectId(req.params.itemId);
+
+    // Verify pharmacy exists
+    const pharmacy = await PharmacyRepo.findById(pharmacyId);
+    if (!pharmacy) throw new BadRequestError('Pharmacy not found');
+
+    // Verify inventory item exists and belongs to pharmacy
+    const inventory = await InventoryRepo.findById(itemId);
+    if (!inventory) throw new BadRequestError('Inventory item not found');
+    if (!inventory.pharmacy.equals(pharmacyId)) {
+      throw new BadRequestError(
+        'Inventory item does not belong to this pharmacy',
+      );
+    }
+
+    await InventoryRepo.delete(itemId);
+
+    new SuccessResponse('Inventory item deleted successfully', {}).send(res);
+  }),
+);
+
 export default router;

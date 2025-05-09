@@ -45,9 +45,21 @@ async function update(inventory: Partial<Inventory>): Promise<Inventory> {
   return updated;
 }
 
+async function deleteInventory(id: Types.ObjectId): Promise<Inventory> {
+  const now = new Date();
+  const deleted = await InventoryModel.findByIdAndUpdate(
+    id,
+    { status: false, updatedAt: now },
+    { new: true },
+  ).lean();
+  if (!deleted) throw new Error('Inventory not found');
+  return deleted;
+}
+
 export default {
   findById,
   findByPharmacyId,
   create,
   update,
+  delete: deleteInventory,
 };
