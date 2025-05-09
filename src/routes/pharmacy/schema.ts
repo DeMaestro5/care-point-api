@@ -23,4 +23,21 @@ export default {
     licenseNumber: Joi.string().optional(),
     operatingHours: Joi.string().optional(),
   }),
+
+  listInventory: Joi.object().keys({
+    page: Joi.number().min(1),
+    limit: Joi.number().min(1).max(100),
+  }),
+
+  createInventory: Joi.object({
+    name: Joi.string().required(),
+    description: Joi.string(),
+    category: Joi.string().required(),
+    quantity: Joi.number().min(0).required(),
+    unit: Joi.string().required(),
+    price: Joi.number().min(0).required(),
+    expiryDate: Joi.date(),
+    batchNumber: Joi.string(),
+    manufacturer: Joi.string(),
+  }),
 };

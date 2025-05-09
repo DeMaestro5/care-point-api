@@ -9,12 +9,14 @@ import asyncHandler from '../../helpers/asyncHandler';
 import authentication from '../../auth/authentication';
 import { Types } from 'mongoose';
 import { PharmacyModel } from '../../database/model/Pharmacy';
-
+import inventoryRouter from './inventory';
 const router = express.Router();
 
 /*-------------------------------------------------------------------------*/
 router.use(authentication);
 /*-------------------------------------------------------------------------*/
+
+router.use('/:pharmacyId/inventory', inventoryRouter);
 
 router.get(
   '/',
