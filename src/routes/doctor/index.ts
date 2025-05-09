@@ -12,6 +12,9 @@ import availabilityRouter from './availability';
 import appointmentsRouter from './appointments';
 import patientsRouter from './patients';
 import reviewsRouter from './reviews';
+import specializationsRouter from './specializations';
+import SpecializationRepo from '../../database/repository/SpecializationRepo';
+
 const router = express.Router();
 
 /*-------------------------------------------------------------------------*/
@@ -22,6 +25,16 @@ router.use('/:doctorId/availability', availabilityRouter);
 router.use('/:doctorId/appointments', appointmentsRouter);
 router.use('/:doctorId/patients', patientsRouter);
 router.use('/:doctorId/reviews', reviewsRouter);
+router.use('/:doctorId/specialization', specializationsRouter);
+
+// Get all specializations - must be before /:id route
+router.get(
+  '/specializations',
+  asyncHandler(async (req, res) => {
+    const specializations = await SpecializationRepo.findAllSpecializations();
+    new SuccessResponse('success', { specializations }).send(res);
+  }),
+);
 
 router.get(
   '/',
