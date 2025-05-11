@@ -26,6 +26,35 @@ async function findByPatientId(
     .exec();
 }
 
+async function findByPharmacyId(
+  pharmacyId: Types.ObjectId,
+  filter: any,
+  skip: number,
+  limit: number,
+): Promise<Prescription[]> {
+  return PrescriptionModel.find({
+    pharmacy: pharmacyId,
+    ...filter,
+  })
+    .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(limit)
+    .populate('patient', 'name email')
+    .populate('doctor', 'name email')
+    .lean<Prescription[]>()
+    .exec();
+}
+
+async function countByPharmacyId(
+  pharmacyId: Types.ObjectId,
+  filter: any,
+): Promise<number> {
+  return PrescriptionModel.countDocuments({
+    pharmacy: pharmacyId,
+    ...filter,
+  }).exec();
+}
+
 async function update(
   id: Types.ObjectId,
   prescription: Partial<Prescription>,
@@ -52,6 +81,8 @@ export default {
   create,
   findById,
   findByPatientId,
+  findByPharmacyId,
+  countByPharmacyId,
   update,
   delete: deletePrescription,
 };

@@ -2,10 +2,21 @@ import Doctor, { DoctorModel } from '../model/Doctor';
 import { Types } from 'mongoose';
 
 async function findById(id: Types.ObjectId): Promise<Doctor | null> {
-  return DoctorModel.findOne({ _id: id, status: true })
+  // Try finding by doctor ID first
+  let doctor = await DoctorModel.findOne({ _id: id, status: true })
     .populate('user', 'name email profilePicUrl')
     .lean()
     .exec();
+
+  // If not found, try finding by user ID
+  if (!doctor) {
+    doctor = await DoctorModel.findOne({ user: id, status: true })
+      .populate('user', 'name email profilePicUrl')
+      .lean()
+      .exec();
+  }
+
+  return doctor;
 }
 
 async function findByUserId(userId: Types.ObjectId): Promise<Doctor | null> {

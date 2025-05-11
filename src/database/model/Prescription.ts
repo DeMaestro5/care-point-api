@@ -4,9 +4,10 @@ export const DOCUMENT_NAME = 'Prescription';
 export const COLLECTION_NAME = 'prescriptions';
 
 export default interface Prescription {
-  _id: Types.ObjectId;
+  _id?: Types.ObjectId;
   patient: Types.ObjectId;
   doctor: Types.ObjectId;
+  pharmacy?: Types.ObjectId;
   medications: Array<{
     name: string;
     dosage: string;
@@ -32,6 +33,10 @@ const schema = new Schema<Prescription>(
       type: Schema.Types.ObjectId,
       ref: 'Doctor',
       required: true,
+    },
+    pharmacy: {
+      type: Schema.Types.ObjectId,
+      ref: 'Pharmacy',
     },
     medications: [
       {
@@ -71,6 +76,7 @@ const schema = new Schema<Prescription>(
 
 schema.index({ patient: 1 });
 schema.index({ doctor: 1 });
+schema.index({ pharmacy: 1 });
 schema.index({ status: 1 });
 
 export const PrescriptionModel = model<Prescription>(

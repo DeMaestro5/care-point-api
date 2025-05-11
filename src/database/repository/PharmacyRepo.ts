@@ -2,7 +2,7 @@ import Pharmacy, { PharmacyModel } from '../model/Pharmacy';
 import { Types } from 'mongoose';
 
 async function findById(id: Types.ObjectId): Promise<Pharmacy | null> {
-  return PharmacyModel.findOne({ _id: id, status: true })
+  return PharmacyModel.findById(id)
     .populate('user', 'name email profilePicUrl')
     .lean()
     .exec();
