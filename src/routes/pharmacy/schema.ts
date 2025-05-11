@@ -52,4 +52,32 @@ export default {
     batchNumber: Joi.string(),
     manufacturer: Joi.string(),
   }),
+
+  updatePrescriptionStatus: Joi.object({
+    status: Joi.string().valid('ACTIVE', 'COMPLETED', 'CANCELLED').required(),
+  }),
+
+  listPrescriptions: Joi.object().keys({
+    page: Joi.number().min(1).default(1),
+    limit: Joi.number().min(1).max(100).default(10),
+    status: Joi.string().valid('ACTIVE', 'COMPLETED', 'CANCELLED').optional(),
+  }),
+
+  createPrescription: Joi.object({
+    patientId: Joi.string().required(),
+    doctorId: Joi.string().required(),
+    medications: Joi.array()
+      .items(
+        Joi.object({
+          name: Joi.string().required(),
+          dosage: Joi.string().required(),
+          frequency: Joi.string().required(),
+          duration: Joi.string().required(),
+          instructions: Joi.string(),
+        }),
+      )
+      .required(),
+    diagnosis: Joi.string(),
+    notes: Joi.string(),
+  }),
 };

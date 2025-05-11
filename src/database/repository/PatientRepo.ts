@@ -5,26 +5,19 @@ import { Types } from 'mongoose';
 async function findById(id: Types.ObjectId): Promise<Patient | null> {
   console.log(`Finding patient by ID: ${id}, type: ${typeof id}`);
 
-  // First attempt - Check if the patient exists without any filters
-  const patientExists = await PatientModel.exists({ _id: id });
-  console.log(`Patient exists check: ${patientExists}`);
-
-  // Second attempt - Find without the status filter to check if it's a status issue
-  const patientWithoutStatus = await PatientModel.findOne({ _id: id })
+  // Try finding by patient ID first
+  let patient = await PatientModel.findOne({ _id: id, status: true })
     .populate('user', 'name email profilePicUrl')
     .lean()
     .exec();
-  console.log(
-    `Patient without status filter: ${
-      patientWithoutStatus ? 'Found' : 'Not found'
-    }`,
-  );
 
-  // Original query with status filter
-  const patient = await PatientModel.findOne({ _id: id, status: true })
-    .populate('user', 'name email profilePicUrl')
-    .lean()
-    .exec();
+  // If not found, try finding by user ID
+  if (!patient) {
+    patient = await PatientModel.findOne({ user: id, status: true })
+      .populate('user', 'name email profilePicUrl')
+      .lean()
+      .exec();
+  }
 
   console.log(
     `Final patient result with status filter: ${
