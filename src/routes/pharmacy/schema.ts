@@ -80,4 +80,26 @@ export default {
     diagnosis: Joi.string(),
     notes: Joi.string(),
   }),
+
+  createOrder: Joi.object({
+    items: Joi.array()
+      .items(
+        Joi.object({
+          inventory: Joi.string().required(),
+          quantity: Joi.number().min(1).required(),
+          price: Joi.number().min(0).required(),
+        }),
+      )
+      .min(1)
+      .required(),
+    notes: Joi.string(),
+  }),
+
+  listOrders: Joi.object().keys({
+    page: Joi.number().min(1).default(1),
+    limit: Joi.number().min(1).max(100).default(10),
+    status: Joi.string()
+      .valid('PENDING', 'PROCESSING', 'COMPLETED', 'CANCELLED')
+      .optional(),
+  }),
 };

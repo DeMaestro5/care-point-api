@@ -113,11 +113,11 @@ router.get(
 
 // Update prescription status
 router.put(
-  '/:rxId',
+  '/:prescriptionId',
   validator(schema.updatePrescriptionStatus),
   asyncHandler(async (req: ProtectedRequest, res) => {
     const pharmacyId = new Types.ObjectId(req.params.pharmacyId);
-    const prescriptionId = new Types.ObjectId(req.params.rxId);
+    const prescriptionId = new Types.ObjectId(req.params.prescriptionId);
 
     // Verify pharmacy exists
     const pharmacy = await PharmacyRepo.findById(pharmacyId);
