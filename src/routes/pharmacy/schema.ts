@@ -102,4 +102,33 @@ export default {
       .valid('PENDING', 'PROCESSING', 'COMPLETED', 'CANCELLED')
       .optional(),
   }),
+
+  getPharmacyAnalytics: Joi.object({
+    query: Joi.object({
+      startDate: Joi.date().iso().required(),
+      endDate: Joi.date().iso().min(Joi.ref('startDate')).required(),
+    }),
+  }),
+
+  getSalesReport: Joi.object({
+    query: Joi.object({
+      startDate: Joi.date().iso().required(),
+      endDate: Joi.date().iso().min(Joi.ref('startDate')).required(),
+      groupBy: Joi.string().valid('day', 'week', 'month').default('day'),
+    }),
+  }),
+
+  searchMedications: Joi.object({
+    query: Joi.object({
+      query: Joi.string().allow(''),
+      page: Joi.number().min(1).default(1),
+      limit: Joi.number().min(1).max(100).default(10),
+    }),
+  }),
+
+  getMedication: Joi.object({
+    params: Joi.object({
+      id: Joi.string().required(),
+    }),
+  }),
 };
