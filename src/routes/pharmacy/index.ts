@@ -12,7 +12,9 @@ import { PharmacyModel } from '../../database/model/Pharmacy';
 import inventoryRouter from './inventory';
 import prescriptionsRouter from './prescriptions';
 import ordersRouter from './orders';
-
+import analyticsRouter from './analytics';
+import medicationsRouter from './medications';
+import salesRouter from './sales';
 const router = express.Router();
 
 /*-------------------------------------------------------------------------*/
@@ -22,7 +24,9 @@ router.use(authentication);
 router.use('/:pharmacyId/inventory', inventoryRouter);
 router.use('/:pharmacyId/prescriptions', prescriptionsRouter);
 router.use('/:pharmacyId/orders', ordersRouter);
-
+router.use('/:pharmacyId/analytics', analyticsRouter);
+router.use('/:pharmacyId/medications', medicationsRouter);
+router.use('/:pharmacyId/sales', salesRouter);
 router.get(
   '/',
   validator(schema.listPharmacies),
