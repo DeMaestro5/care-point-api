@@ -11,6 +11,7 @@ import { Types } from 'mongoose';
 import { PharmacyModel } from '../../database/model/Pharmacy';
 import inventoryRouter from './inventory';
 import prescriptionsRouter from './prescriptions';
+import ordersRouter from './orders';
 
 const router = express.Router();
 
@@ -20,6 +21,7 @@ router.use(authentication);
 
 router.use('/:pharmacyId/inventory', inventoryRouter);
 router.use('/:pharmacyId/prescriptions', prescriptionsRouter);
+router.use('/:pharmacyId/orders', ordersRouter);
 
 router.get(
   '/',
