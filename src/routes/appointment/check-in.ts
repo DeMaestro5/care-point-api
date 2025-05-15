@@ -30,11 +30,18 @@ router.post(
       throw new BadRequestError('Appointment is already checked in');
     }
 
-    appointment.checkInTime = checkInTime;
-    await appointment.save();
+    // Update the appointment with check-in time
+    const updatedAppointment = await AppointmentRepo.update(
+      new Types.ObjectId(appointmentId),
+      { checkInTime: new Date(checkInTime) },
+    );
+
+    if (!updatedAppointment) {
+      throw new BadRequestError('Failed to check in appointment');
+    }
 
     return new SuccessResponse('Appointment checked in successfully', {
-      appointment,
+      appointment: updatedAppointment,
     }).send(res);
   }),
 );

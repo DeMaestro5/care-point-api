@@ -19,8 +19,8 @@ router.use(authentication);
 
 router.use('/:appointmentId/status', statusRouter);
 router.use('/:appointmentId/reschedule', rescheduleRouter);
-router.use('/availability', availabilityRouter);
-router.use('/check-in', checkInRouter);
+router.use('/:appointmentId/availability', availabilityRouter);
+router.use('/:appointmentId/check-in', checkInRouter);
 
 // Get all appointments with filtering
 router.get(
