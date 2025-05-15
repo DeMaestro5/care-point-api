@@ -11,7 +11,7 @@ import patientRoutes from './patient';
 import doctorRoutes from './doctor';
 import ambulanceRoutes from './ambulance';
 import pharmacyRoutes from './pharmacy';
-import medicationRoutes from './pharmacy/medications';
+import appointmentRoutes from './appointment/appointments';
 
 const router = express.Router();
 
@@ -30,6 +30,6 @@ router.use('/api/v1/patients', patientRoutes);
 router.use('/api/v1/doctors', doctorRoutes);
 router.use('/api/v1/ambulances', ambulanceRoutes);
 router.use('/api/v1/pharmacies', pharmacyRoutes);
-router.use('/api/v1/medications', medicationRoutes);
+router.use('/api/v1/appointments', appointmentRoutes);
 
 export default router;
