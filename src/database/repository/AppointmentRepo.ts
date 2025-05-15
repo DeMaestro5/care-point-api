@@ -258,6 +258,34 @@ async function findByDoctorId(
     .exec();
 }
 
+async function findByFilter(
+  filter: any,
+  options: { page: number; limit: number },
+): Promise<{ appointments: PopulatedAppointment[]; total: number }> {
+  const { page, limit } = options;
+  const skip = (page - 1) * limit;
+
+  const [appointments, total] = await Promise.all([
+    AppointmentModel.find(filter)
+      .populate({
+        path: 'doctor',
+        select: 'name specialization user hospital',
+        populate: {
+          path: 'user',
+          select: 'name email',
+        },
+      })
+      .sort({ appointmentDate: -1 })
+      .skip(skip)
+      .limit(limit)
+      .lean()
+      .exec(),
+    AppointmentModel.countDocuments(filter),
+  ]);
+
+  return { appointments, total };
+}
+
 export default {
   findByPatientId,
   findById,
@@ -266,4 +294,5 @@ export default {
   delete: deleteById,
   findUpcomingByPatientId,
   findByDoctorId,
+  findByFilter,
 };

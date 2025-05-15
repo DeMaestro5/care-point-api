@@ -64,12 +64,12 @@ schema.pre('save', function (next) {
   console.log('Pre-save hook triggered for appointment:', this._id);
 
   // Ensure patient and doctor are set
-  if (!this.patient) {
-    console.error('Missing patient reference in appointment');
-  }
-  if (!this.doctor) {
-    console.error('Missing doctor reference in appointment');
-  }
+  // if (!this.patient) {
+  //   console.error('Missing patient reference in appointment');
+  // }
+  // if (!this.doctor) {
+  //   console.error('Missing doctor reference in appointment');
+  // }
 
   next();
 });
