@@ -35,4 +35,10 @@ export default {
       .valid('scheduled', 'completed', 'cancelled')
       .required(),
   }),
+
+  rescheduleAppointment: Joi.object().keys({
+    appointmentDate: Joi.date().iso().required(),
+    reason: Joi.string().required().trim(),
+    notes: Joi.string().trim().optional(),
+  }),
 };

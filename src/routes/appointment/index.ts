@@ -10,14 +10,13 @@ import schema from './schema';
 import authentication from '../../auth/authentication';
 import type Appointment from '../../database/model/Appointment';
 import statusRouter from './status';
-const router = express.Router();
+import rescheduleRouter from './reschedule';
 
-/*-------------------------------------------------------------------------*/
-// Below all routes require authenticated user
-/*-------------------------------------------------------------------------*/
+const router = express.Router();
 router.use(authentication);
 
 router.use('/:appointmentId/status', statusRouter);
+router.use('/:appointmentId/reschedule', rescheduleRouter);
 
 // Get all appointments with filtering
 router.get(
