@@ -9,13 +9,18 @@ import validator from '../../helpers/validator';
 import schema from './schema';
 import authentication from '../../auth/authentication';
 import type Appointment from '../../database/model/Appointment';
-
+import statusRouter from './status';
+import rescheduleRouter from './reschedule';
+import availabilityRouter from './availability';
+import checkInRouter from './check-in';
 const router = express.Router();
 
-/*-------------------------------------------------------------------------*/
-// Below all routes require authenticated user
-/*-------------------------------------------------------------------------*/
 router.use(authentication);
+
+router.use('/:appointmentId/status', statusRouter);
+router.use('/:appointmentId/reschedule', rescheduleRouter);
+router.use('/availability', availabilityRouter);
+router.use('/check-in', checkInRouter);
 
 // Get all appointments with filtering
 router.get(
@@ -112,13 +117,18 @@ router.put(
   validator(schema.updateAppointment),
   asyncHandler(async (req: ProtectedRequest, res) => {
     const { appointmentId } = req.params;
-    const { status } = req.body;
+    const { appointmentDate, reason, notes } = req.body;
 
-    console.log('Handler: Updating appointment:', { appointmentId, status });
+    console.log('Handler: Updating appointment:', {
+      appointmentId,
+      appointmentDate,
+      reason,
+      notes,
+    });
 
     const appointment = await AppointmentRepo.update(
       new Types.ObjectId(appointmentId),
-      { status },
+      { appointmentDate, reason, notes },
     );
 
     if (!appointment) {

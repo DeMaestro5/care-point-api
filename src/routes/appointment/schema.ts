@@ -25,8 +25,20 @@ export default {
   }),
 
   updateAppointment: Joi.object().keys({
+    appointmentDate: Joi.date().iso(),
+    reason: Joi.string().required().trim(),
+    notes: Joi.string().trim().optional(),
+  }),
+
+  updateAppointmentStatus: Joi.object().keys({
     status: Joi.string()
       .valid('scheduled', 'completed', 'cancelled')
       .required(),
+  }),
+
+  rescheduleAppointment: Joi.object().keys({
+    appointmentDate: Joi.date().iso().required(),
+    reason: Joi.string().required().trim(),
+    notes: Joi.string().trim().optional(),
   }),
 };

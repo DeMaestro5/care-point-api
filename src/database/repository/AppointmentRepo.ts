@@ -286,6 +286,17 @@ async function findByFilter(
   return { appointments, total };
 }
 
+async function getAvailability(
+  doctorId: Types.ObjectId,
+  startDate: Date,
+  endDate: Date,
+): Promise<PopulatedAppointment[]> {
+  return AppointmentModel.find({
+    doctor: doctorId,
+    appointmentDate: { $gte: startDate, $lte: endDate },
+  });
+}
+
 export default {
   findByPatientId,
   findById,
@@ -295,4 +306,5 @@ export default {
   findUpcomingByPatientId,
   findByDoctorId,
   findByFilter,
+  getAvailability,
 };
