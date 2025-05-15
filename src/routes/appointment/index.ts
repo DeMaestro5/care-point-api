@@ -106,6 +106,7 @@ router.post(
   }),
 );
 
+// Update an appointment
 router.put(
   '/:appointmentId',
   validator(schema.updateAppointment),
@@ -129,6 +130,25 @@ router.put(
     return new SuccessResponse('Appointment updated successfully', {
       appointment,
     }).send(res);
+  }),
+);
+
+// Delete an appointment / cancel an appointment
+router.delete(
+  '/:appointmentId',
+  asyncHandler(async (req: ProtectedRequest, res) => {
+    const { appointmentId } = req.params;
+
+    const appointment = await AppointmentRepo.delete(
+      new Types.ObjectId(appointmentId),
+    );
+
+    return new SuccessResponse(
+      'Appointment deleted / cancelled  successfully',
+      {
+        appointment,
+      },
+    ).send(res);
   }),
 );
 
