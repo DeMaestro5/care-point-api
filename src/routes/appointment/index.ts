@@ -13,6 +13,8 @@ import statusRouter from './status';
 import rescheduleRouter from './reschedule';
 import availabilityRouter from './availability';
 import checkInRouter from './check-in';
+import slotsRouter from './slots';
+
 const router = express.Router();
 
 router.use(authentication);
@@ -21,6 +23,7 @@ router.use('/:appointmentId/status', statusRouter);
 router.use('/:appointmentId/reschedule', rescheduleRouter);
 router.use('/:appointmentId/availability', availabilityRouter);
 router.use('/:appointmentId/check-in', checkInRouter);
+router.use('/slots', slotsRouter);
 
 // Get all appointments with filtering
 router.get(
