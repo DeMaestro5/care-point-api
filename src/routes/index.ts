@@ -11,7 +11,7 @@ import patientRoutes from './patient';
 import doctorRoutes from './doctor';
 import ambulanceRoutes from './ambulance';
 import pharmacyRoutes from './pharmacy';
-import appointmentRoutes from './appointment/appointments';
+import appointmentRoutes from './appointment';
 
 const router = express.Router();
 
