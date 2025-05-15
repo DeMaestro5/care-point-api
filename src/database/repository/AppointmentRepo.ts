@@ -61,8 +61,6 @@ async function create(
   appointment: Partial<Appointment>,
 ): Promise<PopulatedAppointment> {
   try {
-    console.log('Repository: Creating appointment with data:', appointment);
-
     // Ensure patient and doctor are ObjectIds
     const appointmentData = {
       ...appointment,
@@ -71,13 +69,23 @@ async function create(
       appointmentDate: new Date(appointment.appointmentDate as Date),
     };
 
-    console.log('Repository: Processed appointment data:', appointmentData);
-
     const createdAppointment = await AppointmentModel.create(appointmentData);
-    console.log('Repository: Created appointment:', createdAppointment);
 
-    // Fetch the populated appointment
-    const populatedAppointment = await findById(createdAppointment._id);
+    // Fetch the populated appointment without patient data
+    const populatedAppointment = await AppointmentModel.findById(
+      createdAppointment._id,
+    )
+      .populate({
+        path: 'doctor',
+        select: 'name specialization user hospital',
+        populate: {
+          path: 'user',
+          select: 'name email',
+        },
+      })
+      .lean()
+      .exec();
+
     if (!populatedAppointment) {
       throw new Error('Failed to create appointment');
     }
@@ -101,7 +109,6 @@ async function update(
 
     // First, get the existing appointment to check if it exists
     const existingAppointment = await AppointmentModel.findById(id);
-    console.log('Repository: Found existing appointment:', existingAppointment);
 
     if (!existingAppointment) {
       console.log('Repository: No existing appointment found');
@@ -130,8 +137,6 @@ async function update(
       safeUpdate.appointmentDate = new Date(safeUpdate.appointmentDate);
     }
 
-    console.log('Repository: Applying update with data:', safeUpdate);
-
     // Update the appointment
     const updatedAppointment = await AppointmentModel.findByIdAndUpdate(
       id,
@@ -149,25 +154,15 @@ async function update(
           select: 'name email',
         },
       })
-      .populate({
-        path: 'patient',
-        select: 'name user dateOfBirth gender',
-        populate: {
-          path: 'user',
-          select: 'name email',
-        },
-      })
+      .lean()
       .exec();
 
     if (!updatedAppointment) {
-      console.log('Repository: Failed to update appointment');
       return null;
     }
 
     // Convert to plain object to match the expected type
-    const plainAppointment = updatedAppointment.toObject();
-    console.log('Repository: Updated appointment result:', plainAppointment);
-    return plainAppointment;
+    return updatedAppointment;
   } catch (error) {
     console.error('Repository: Error updating appointment:', error);
     throw error;
@@ -236,26 +231,28 @@ async function findUpcomingByPatientId(
 async function findByDoctorId(
   doctorId: Types.ObjectId,
 ): Promise<PopulatedAppointment[]> {
-  return AppointmentModel.find({ doctor: doctorId })
-    .populate({
-      path: 'patient',
-      select: 'name user dateOfBirth gender',
-      populate: {
-        path: 'user',
-        select: 'name email',
-      },
-    })
-    .populate({
-      path: 'doctor',
-      select: 'name specialization user hospital',
-      populate: {
-        path: 'user',
-        select: 'name email',
-      },
-    })
-    .sort({ appointmentDate: -1 })
-    .lean()
-    .exec();
+  return (
+    AppointmentModel.find({ doctor: doctorId })
+      // .populate({
+      //   path: 'patient',
+      //   select: 'name user dateOfBirth gender',
+      //   populate: {
+      //     path: 'user',
+      //     select: 'name email',
+      //   },
+      // })
+      .populate({
+        path: 'doctor',
+        select: 'name specialization user hospital',
+        populate: {
+          path: 'user',
+          select: 'name email',
+        },
+      })
+      .sort({ appointmentDate: -1 })
+      .lean()
+      .exec()
+  );
 }
 
 async function findByFilter(
@@ -264,6 +261,8 @@ async function findByFilter(
 ): Promise<{ appointments: PopulatedAppointment[]; total: number }> {
   const { page, limit } = options;
   const skip = (page - 1) * limit;
+
+  console.log('Repository: Finding appointments with filter:', filter);
 
   const [appointments, total] = await Promise.all([
     AppointmentModel.find(filter)
@@ -283,6 +282,7 @@ async function findByFilter(
     AppointmentModel.countDocuments(filter),
   ]);
 
+  console.log('Repository: Found appointments:', appointments);
   return { appointments, total };
 }
 

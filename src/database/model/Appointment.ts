@@ -4,8 +4,8 @@ export const DOCUMENT_NAME = 'Appointment';
 export const COLLECTION_NAME = 'appointments';
 
 export default interface Appointment extends Document {
-  patient: Schema.Types.ObjectId;
   doctor: Schema.Types.ObjectId;
+  patient: Schema.Types.ObjectId;
   appointmentDate: Date;
   status: 'scheduled' | 'completed' | 'cancelled' | 'rescheduled';
   reason: string;
@@ -16,17 +16,18 @@ export default interface Appointment extends Document {
 
 const schema = new Schema(
   {
-    patient: {
-      type: Schema.Types.ObjectId,
-      ref: 'Patient',
-      required: true,
-      index: true,
-    },
     doctor: {
       type: Schema.Types.ObjectId,
       ref: 'Doctor',
       required: true,
       index: true,
+    },
+    patient: {
+      type: Schema.Types.ObjectId,
+      ref: 'Patient',
+      required: true,
+      index: true,
+      select: false,
     },
     appointmentDate: {
       type: Date,
@@ -60,32 +61,18 @@ schema.index({ patient: 1, appointmentDate: -1 });
 schema.index({ doctor: 1, appointmentDate: -1 });
 schema.index({ status: 1, appointmentDate: 1 });
 
-schema.pre('save', function (next) {
-  console.log('Pre-save hook triggered for appointment:', this._id);
-
-  // Ensure patient and doctor are set
-  // if (!this.patient) {
-  //   console.error('Missing patient reference in appointment');
-  // }
-  // if (!this.doctor) {
-  //   console.error('Missing doctor reference in appointment');
-  // }
-
-  next();
-});
-
 // Static method to fix appointments with missing references
 schema.statics.fixReferences = async function (
   appointmentId: Types.ObjectId,
-  patientId: Types.ObjectId,
   doctorId: Types.ObjectId,
+  patientId: Types.ObjectId,
 ) {
   return this.findByIdAndUpdate(
     appointmentId,
     {
       $set: {
-        patient: patientId,
         doctor: doctorId,
+        patient: patientId,
         updatedAt: new Date(),
       },
     },
@@ -97,8 +84,8 @@ schema.statics.fixReferences = async function (
 export interface AppointmentModelInterface extends Model<Appointment> {
   fixReferences(
     appointmentId: Types.ObjectId,
-    patientId: Types.ObjectId,
     doctorId: Types.ObjectId,
+    patientId: Types.ObjectId,
   ): Promise<Appointment | null>;
 }
 

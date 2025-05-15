@@ -8,6 +8,7 @@ import { Types } from 'mongoose';
 import validator from '../../helpers/validator';
 import schema from './schema';
 import authentication from '../../auth/authentication';
+import type Appointment from '../../database/model/Appointment';
 
 const router = express.Router();
 
@@ -53,11 +54,6 @@ router.get(
       filter.doctor = new Types.ObjectId(req.user._id);
     }
 
-    // If user is a patient, they can only see their appointments
-    if (req.user.role === 'PATIENT') {
-      filter.patient = new Types.ObjectId(req.user._id);
-    }
-
     console.log('Handler: Finding appointments with filter:', filter);
 
     const { appointments, total } = await AppointmentRepo.findByFilter(filter, {
@@ -84,38 +80,53 @@ router.post(
   '/',
   validator(schema.createAppointment),
   asyncHandler(async (req: ProtectedRequest, res) => {
-    const { doctorId, patientId, appointmentDate, reason, notes } = req.body;
+    const { doctorId, appointmentDate, reason, notes } = req.body;
 
-    console.log('Handler: Creating appointment with data:', {
-      doctorId,
-      patientId,
-      appointmentDate,
-      reason,
-      notes,
-    });
-
-    // If user is a doctor, they can create appointments for any patient
-    // If user is a patient, they can only create appointments for themselves
-    if (req.user.role === 'PATIENT' && patientId !== req.user._id.toString()) {
+    // Determine the patient ID based on user role
+    if (req.user.role !== 'PATIENT') {
       throw new BadRequestError(
-        'You can only create appointments for yourself',
+        'Only patients can create appointments through this endpoint',
       );
     }
 
-    const appointmentData = {
-      doctor: new Types.ObjectId(doctorId) as any,
-      patient: new Types.ObjectId(patientId) as any,
-      appointmentDate: new Date(appointmentDate),
+    const appointmentData: Partial<Appointment> = {
+      doctor: doctorId as any,
+      patient: req.user._id as any,
+      appointmentDate,
       reason,
       notes,
-      status: 'scheduled' as const,
+      status: 'scheduled',
     };
 
     const appointment = await AppointmentRepo.create(appointmentData);
 
-    console.log('Handler: Created appointment, sending response');
-
     return new SuccessResponse('Appointment created successfully', {
+      appointment,
+    }).send(res);
+  }),
+);
+
+router.put(
+  '/:appointmentId',
+  validator(schema.updateAppointment),
+  asyncHandler(async (req: ProtectedRequest, res) => {
+    const { appointmentId } = req.params;
+    const { status } = req.body;
+
+    console.log('Handler: Updating appointment:', { appointmentId, status });
+
+    const appointment = await AppointmentRepo.update(
+      new Types.ObjectId(appointmentId),
+      { status },
+    );
+
+    if (!appointment) {
+      throw new BadRequestError('Appointment not found or update failed');
+    }
+
+    console.log('Handler: Successfully updated appointment:', appointment);
+
+    return new SuccessResponse('Appointment updated successfully', {
       appointment,
     }).send(res);
   }),
