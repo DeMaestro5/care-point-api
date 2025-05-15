@@ -10,6 +10,7 @@ export default interface Appointment extends Document {
   status: 'scheduled' | 'completed' | 'cancelled' | 'rescheduled';
   reason: string;
   notes?: string;
+  checkInTime?: Date;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -49,6 +50,9 @@ const schema = new Schema(
     notes: {
       type: String,
       trim: true,
+    },
+    checkInTime: {
+      type: Date,
     },
   },
   {

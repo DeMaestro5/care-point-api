@@ -1,6 +1,7 @@
 import { Types } from 'mongoose';
 import { AppointmentModel } from '../model/Appointment';
 import type Appointment from '../model/Appointment';
+import { DoctorModel } from '../model/Doctor';
 
 type PopulatedAppointment = any; // TODO: Create proper type for populated appointment
 
@@ -290,11 +291,69 @@ async function getAvailability(
   doctorId: Types.ObjectId,
   startDate: Date,
   endDate: Date,
-): Promise<PopulatedAppointment[]> {
-  return AppointmentModel.find({
+): Promise<{ date: Date; availableSlots: string[] }[]> {
+  // First get all booked appointments for the doctor in the date range
+  const bookedAppointments = await AppointmentModel.find({
     doctor: doctorId,
     appointmentDate: { $gte: startDate, $lte: endDate },
-  });
+    status: { $in: ['scheduled', 'rescheduled'] },
+  }).lean();
+
+  // Get doctor's working hours from DoctorRepo
+  const doctor = await DoctorModel.findById(doctorId)
+    .select('availability')
+    .lean();
+
+  if (!doctor || !doctor.availability) {
+    return [];
+  }
+
+  const availableSlots: { date: Date; availableSlots: string[] }[] = [];
+  const currentDate = new Date(startDate);
+  const endDateTime = new Date(endDate);
+
+  // Map of day number to day name
+  const dayMap: { [key: number]: keyof typeof doctor.availability } = {
+    0: 'sunday',
+    1: 'monday',
+    2: 'tuesday',
+    3: 'wednesday',
+    4: 'thursday',
+    5: 'friday',
+    6: 'saturday',
+  };
+
+  // For each day in the range
+  while (currentDate <= endDateTime) {
+    const dayOfWeek = currentDate.getDay();
+    const dayName = dayMap[dayOfWeek];
+    const dayAvailability = doctor.availability[dayName];
+
+    if (dayAvailability && dayAvailability.length > 0) {
+      // Filter out slots that are already booked
+      const availableDaySlots = dayAvailability.filter((slot) => {
+        const slotDateTime = new Date(
+          `${currentDate.toISOString().split('T')[0]}T${slot}`,
+        );
+        return !bookedAppointments.some(
+          (appt) =>
+            appt.appointmentDate.toISOString() === slotDateTime.toISOString(),
+        );
+      });
+
+      if (availableDaySlots.length > 0) {
+        availableSlots.push({
+          date: new Date(currentDate),
+          availableSlots: availableDaySlots,
+        });
+      }
+    }
+
+    // Move to next day
+    currentDate.setDate(currentDate.getDate() + 1);
+  }
+
+  return availableSlots;
 }
 
 export default {
