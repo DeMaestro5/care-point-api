@@ -119,11 +119,11 @@ router.post(
 );
 
 router.get(
-  '/:id',
+  '/:prescriptionId',
   asyncHandler(async (req: ProtectedRequest, res) => {
-    const { id } = req.params;
+    const { prescriptionId } = req.params;
     const prescription = await PrescriptionRepo.findById(
-      new Types.ObjectId(id),
+      new Types.ObjectId(prescriptionId),
     );
     if (!prescription) throw new BadRequestError('Prescription not found');
 
@@ -132,4 +132,55 @@ router.get(
     );
   }),
 );
+
+router.put(
+  '/:prescriptionId',
+  validator(schema.updatePrescription),
+  doctorAuth,
+  asyncHandler(async (req: ProtectedRequest, res) => {
+    const { prescriptionId } = req.params;
+    const { medications, diagnosis, notes, status } = req.body;
+
+    // Find the prescription first to verify ownership
+    const existingPrescription = await PrescriptionRepo.findById(
+      new Types.ObjectId(prescriptionId),
+    );
+    if (!existingPrescription)
+      throw new BadRequestError('Prescription not found');
+
+    // Verify the doctor owns this prescription
+    const doctor = await DoctorRepo.findByUserId(
+      new Types.ObjectId(req.user._id),
+    );
+    if (!doctor) throw new BadRequestError('Doctor not found');
+    if (!existingPrescription.doctor.equals(doctor._id)) {
+      throw new BadRequestError(
+        'You are not authorized to update this prescription',
+      );
+    }
+
+    // Prepare update data
+    const updateData: any = {
+      updatedAt: new Date(),
+    };
+
+    // Only update fields that are provided
+    if (medications) updateData.medications = medications;
+    if (diagnosis) updateData.diagnosis = diagnosis;
+    if (notes) updateData.notes = notes;
+    if (status) updateData.status = status;
+
+    const prescription = await PrescriptionRepo.update(
+      new Types.ObjectId(prescriptionId),
+      updateData,
+    );
+    if (!prescription)
+      throw new BadRequestError('Failed to update prescription');
+
+    new SuccessResponse('Prescription updated successfully', prescription).send(
+      res,
+    );
+  }),
+);
+
 export default router;

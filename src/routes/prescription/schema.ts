@@ -26,4 +26,20 @@ export default {
     diagnosis: Joi.string().required(),
     notes: Joi.string().optional(),
   }),
+  updatePrescription: Joi.object().keys({
+    medications: Joi.array()
+      .items(
+        Joi.object({
+          name: Joi.string().required(),
+          dosage: Joi.string().required(),
+          frequency: Joi.string().required(),
+          duration: Joi.string().required(),
+          instructions: Joi.string().optional(),
+        }),
+      )
+      .optional(),
+    diagnosis: Joi.string().optional(),
+    notes: Joi.string().optional(),
+    status: Joi.string().valid('ACTIVE', 'COMPLETED', 'CANCELLED').optional(),
+  }),
 };
