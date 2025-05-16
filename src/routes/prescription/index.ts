@@ -118,4 +118,18 @@ router.post(
   }),
 );
 
+router.get(
+  '/:id',
+  asyncHandler(async (req: ProtectedRequest, res) => {
+    const { id } = req.params;
+    const prescription = await PrescriptionRepo.findById(
+      new Types.ObjectId(id),
+    );
+    if (!prescription) throw new BadRequestError('Prescription not found');
+
+    new SuccessResponse('Prescription fetched successfully', prescription).send(
+      res,
+    );
+  }),
+);
 export default router;
