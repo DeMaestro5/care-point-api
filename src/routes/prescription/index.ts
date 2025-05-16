@@ -6,8 +6,18 @@ import { SuccessResponse } from '../../core/ApiResponse';
 import PrescriptionRepo from '../../database/repository/PrescriptionRepo';
 import validator from '../../helpers/validator';
 import schema from './schema';
+import { BadRequestError } from '../../core/ApiError';
+import PatientRepo from '../../database/repository/PatientRepo';
+import DoctorRepo from '../../database/repository/DoctorRepo';
+import PharmacyRepo from '../../database/repository/PharmacyRepo';
+import doctorAuth from '../../auth/doctorAuth';
+import authentication from '../../auth/authentication';
 
 const router = express.Router();
+
+/*-------------------------------------------------------------------------*/
+router.use(authentication);
+/*-------------------------------------------------------------------------*/
 
 // List prescriptions with filtering
 router.get(
@@ -52,6 +62,59 @@ router.get(
         pages: Math.ceil(total / Number(limit)),
       },
     }).send(res);
+  }),
+);
+
+router.post(
+  '/',
+  validator(schema.createPrescription),
+  doctorAuth,
+  asyncHandler(async (req: ProtectedRequest, res) => {
+    const { patientId, pharmacyId, medications, diagnosis, notes } = req.body;
+
+    console.log('Request body:', {
+      patientId,
+      pharmacyId,
+      authenticatedUserId: req.user._id,
+    });
+
+    // Verify patient exists
+    const patient = await PatientRepo.findByUserId(
+      new Types.ObjectId(patientId),
+    );
+    if (!patient) throw new BadRequestError('Patient not found');
+
+    // Find doctor by authenticated user's ID
+    const doctor = await DoctorRepo.findByUserId(
+      new Types.ObjectId(req.user._id),
+    );
+    console.log('Found doctor:', {
+      doctorId: doctor?._id,
+      doctorUserId: doctor?.user,
+      authenticatedUserId: req.user._id,
+    });
+
+    if (!doctor) throw new BadRequestError('Doctor not found');
+
+    // Verify pharmacy exists
+    const pharmacy = await PharmacyRepo.findById(
+      new Types.ObjectId(pharmacyId),
+    );
+    if (!pharmacy) throw new BadRequestError('Pharmacy not found');
+
+    const prescription = await PrescriptionRepo.create({
+      patient: patient._id,
+      doctor: doctor._id,
+      pharmacy: pharmacy._id,
+      medications,
+      diagnosis,
+      notes,
+      status: 'ACTIVE',
+    });
+
+    new SuccessResponse('Prescription created successfully', prescription).send(
+      res,
+    );
   }),
 );
 
