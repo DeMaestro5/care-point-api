@@ -39,8 +39,22 @@ async function findByPharmacyId(
     .sort({ createdAt: -1 })
     .skip(skip)
     .limit(limit)
-    .populate('patient', 'name email')
-    .populate('doctor', 'name email')
+    .populate({
+      path: 'patient',
+      select: 'name email dateOfBirth gender bloodGroup',
+      populate: {
+        path: 'user',
+        select: 'name email profilePicUrl',
+      },
+    })
+    .populate({
+      path: 'doctor',
+      select: 'name email specialization licenseNumber',
+      populate: {
+        path: 'user',
+        select: 'name email profilePicUrl',
+      },
+    })
     .lean<Prescription[]>()
     .exec();
 }
@@ -77,6 +91,26 @@ async function deletePrescription(
     .exec();
 }
 
+async function find(
+  filter: any,
+  skip: number,
+  limit: number,
+): Promise<Prescription[]> {
+  return PrescriptionModel.find(filter)
+    .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(limit)
+    .populate('patient', 'name email')
+    .populate('doctor', 'name email')
+    .populate('pharmacy', 'name')
+    .lean<Prescription[]>()
+    .exec();
+}
+
+async function count(filter: any): Promise<number> {
+  return PrescriptionModel.countDocuments(filter).exec();
+}
+
 export default {
   create,
   findById,
@@ -85,4 +119,6 @@ export default {
   countByPharmacyId,
   update,
   delete: deletePrescription,
+  find,
+  count,
 };
