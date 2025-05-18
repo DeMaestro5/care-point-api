@@ -12,12 +12,18 @@ import DoctorRepo from '../../database/repository/DoctorRepo';
 import PharmacyRepo from '../../database/repository/PharmacyRepo';
 import doctorAuth from '../../auth/doctorAuth';
 import authentication from '../../auth/authentication';
+import statusRouter from './status';
+import refillRouter from './refill';
 
 const router = express.Router();
 
 /*-------------------------------------------------------------------------*/
 router.use(authentication);
 /*-------------------------------------------------------------------------*/
+
+// Mount sub-routes
+router.use('/:prescriptionId/status', statusRouter);
+router.use('/:prescriptionId/refill', refillRouter);
 
 // List prescriptions with filtering
 router.get(
@@ -49,6 +55,7 @@ router.get(
       Number(skip),
       Number(limit),
     );
+    if (!prescriptions) throw new BadRequestError('No prescriptions found');
 
     // Get total count for pagination
     const total = await PrescriptionRepo.count(filter);

@@ -42,4 +42,11 @@ export default {
     notes: Joi.string().optional(),
     status: Joi.string().valid('ACTIVE', 'COMPLETED', 'CANCELLED').optional(),
   }),
+  updatePrescriptionStatus: Joi.object().keys({
+    status: Joi.string().valid('ACTIVE', 'COMPLETED', 'CANCELLED').required(),
+  }),
+  requestPrescriptionRefill: Joi.object().keys({
+    reason: Joi.string().required(),
+    preferredPharmacyId: Joi.string().optional(),
+  }),
 };
