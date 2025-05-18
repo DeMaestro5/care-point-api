@@ -1,9 +1,6 @@
 import Joi from 'joi';
 
 export default {
-  ambulanceId: Joi.object().keys({
-    id: Joi.string().required(),
-  }),
   addCoverage: Joi.object().keys({
     area: Joi.string().required().min(3).max(100),
     radius: Joi.number().required().min(1).max(100),
@@ -68,5 +65,34 @@ export default {
   }),
   deleteCoverage: Joi.object().keys({
     coverageId: Joi.string().required(),
+  }),
+
+  createEmergencyRequest: Joi.object({
+    patientId: Joi.string().required(),
+    location: Joi.object({
+      latitude: Joi.number().required(),
+      longitude: Joi.number().required(),
+      address: Joi.string().required(),
+    }).required(),
+    description: Joi.string().required(),
+    priority: Joi.string().valid('LOW', 'MEDIUM', 'HIGH').required(),
+  }),
+  updateEmergencyRequestStatus: Joi.object({
+    status: Joi.string()
+      .valid('PENDING', 'ACCEPTED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED')
+      .required(),
+  }),
+
+  updateLocation: Joi.object({
+    coordinates: Joi.object({
+      latitude: Joi.number().required().min(-90).max(90),
+      longitude: Joi.number().required().min(-180).max(180),
+    }).required(),
+    address: Joi.string().required().min(3).max(200),
+  }),
+  findNearBy: Joi.object({
+    latitude: Joi.number().required().min(-90).max(90),
+    longitude: Joi.number().required().min(-180).max(180),
+    maxDistance: Joi.number().min(1).max(100).default(10),
   }),
 };

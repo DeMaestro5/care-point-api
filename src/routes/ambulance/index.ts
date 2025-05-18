@@ -7,6 +7,8 @@ import asyncHandler from '../../helpers/asyncHandler';
 import authentication from '../../auth/authentication';
 import { Types } from 'mongoose';
 import coverageRouter from './coverage';
+import emergencyRequestRouter from './emergency-request';
+import locationRouter from './location';
 
 const router = express.Router();
 
@@ -14,7 +16,9 @@ const router = express.Router();
 router.use(authentication);
 /*-------------------------------------------------------------------------*/
 
-router.use('/:ambulanceId/coverage', coverageRouter);
+router.use('/coverage', coverageRouter);
+router.use('/emergency-requests', emergencyRequestRouter);
+router.use('/:ambulanceId/location', locationRouter);
 
 router.get(
   '/',
