@@ -49,4 +49,12 @@ export default {
     reason: Joi.string().required(),
     preferredPharmacyId: Joi.string().optional(),
   }),
+  verifyPrescription: Joi.object().keys({
+    verified: Joi.boolean().required(),
+    notes: Joi.string().optional(),
+  }),
+  dispensePrescription: Joi.object().keys({
+    dispensedBy: Joi.string().required(),
+    notes: Joi.string().optional(),
+  }),
 };

@@ -22,6 +22,17 @@ export default interface Prescription {
     status: 'PENDING' | 'APPROVED' | 'REJECTED';
     requestedAt: Date;
   };
+  verification?: {
+    verified: boolean;
+    verifiedBy: Types.ObjectId;
+    verifiedAt: Date;
+    notes?: string;
+  };
+  dispensing?: {
+    dispensedBy: Types.ObjectId;
+    dispensedAt: Date;
+    notes?: string;
+  };
   notes?: string;
   status: 'ACTIVE' | 'COMPLETED' | 'CANCELLED';
   createdAt?: Date;
@@ -58,6 +69,17 @@ const schema = new Schema<Prescription>(
     },
     refillRequest: {
       type: Schema.Types.Mixed,
+    },
+    verification: {
+      verified: { type: Schema.Types.Boolean },
+      verifiedBy: { type: Schema.Types.ObjectId, ref: 'User' },
+      verifiedAt: { type: Schema.Types.Date },
+      notes: { type: Schema.Types.String },
+    },
+    dispensing: {
+      dispensedBy: { type: Schema.Types.ObjectId, ref: 'User' },
+      dispensedAt: { type: Schema.Types.Date },
+      notes: { type: Schema.Types.String },
     },
     notes: {
       type: Schema.Types.String,
