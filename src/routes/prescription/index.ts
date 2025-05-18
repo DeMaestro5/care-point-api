@@ -12,12 +12,18 @@ import DoctorRepo from '../../database/repository/DoctorRepo';
 import PharmacyRepo from '../../database/repository/PharmacyRepo';
 import doctorAuth from '../../auth/doctorAuth';
 import authentication from '../../auth/authentication';
+import statusRouter from './status';
+import refillRouter from './refill';
 
 const router = express.Router();
 
 /*-------------------------------------------------------------------------*/
 router.use(authentication);
 /*-------------------------------------------------------------------------*/
+
+// Mount sub-routes
+router.use('/:prescriptionId/status', statusRouter);
+router.use('/:prescriptionId/refill', refillRouter);
 
 // List prescriptions with filtering
 router.get(
@@ -49,6 +55,7 @@ router.get(
       Number(skip),
       Number(limit),
     );
+    if (!prescriptions) throw new BadRequestError('No prescriptions found');
 
     // Get total count for pagination
     const total = await PrescriptionRepo.count(filter);
@@ -113,6 +120,71 @@ router.post(
     });
 
     new SuccessResponse('Prescription created successfully', prescription).send(
+      res,
+    );
+  }),
+);
+
+router.get(
+  '/:prescriptionId',
+  asyncHandler(async (req: ProtectedRequest, res) => {
+    const { prescriptionId } = req.params;
+    const prescription = await PrescriptionRepo.findById(
+      new Types.ObjectId(prescriptionId),
+    );
+    if (!prescription) throw new BadRequestError('Prescription not found');
+
+    new SuccessResponse('Prescription fetched successfully', prescription).send(
+      res,
+    );
+  }),
+);
+
+router.put(
+  '/:prescriptionId',
+  validator(schema.updatePrescription),
+  doctorAuth,
+  asyncHandler(async (req: ProtectedRequest, res) => {
+    const { prescriptionId } = req.params;
+    const { medications, diagnosis, notes, status } = req.body;
+
+    // Find the prescription first to verify ownership
+    const existingPrescription = await PrescriptionRepo.findById(
+      new Types.ObjectId(prescriptionId),
+    );
+    if (!existingPrescription)
+      throw new BadRequestError('Prescription not found');
+
+    // Verify the doctor owns this prescription
+    const doctor = await DoctorRepo.findByUserId(
+      new Types.ObjectId(req.user._id),
+    );
+    if (!doctor) throw new BadRequestError('Doctor not found');
+    if (!existingPrescription.doctor.equals(doctor._id)) {
+      throw new BadRequestError(
+        'You are not authorized to update this prescription',
+      );
+    }
+
+    // Prepare update data
+    const updateData: any = {
+      updatedAt: new Date(),
+    };
+
+    // Only update fields that are provided
+    if (medications) updateData.medications = medications;
+    if (diagnosis) updateData.diagnosis = diagnosis;
+    if (notes) updateData.notes = notes;
+    if (status) updateData.status = status;
+
+    const prescription = await PrescriptionRepo.update(
+      new Types.ObjectId(prescriptionId),
+      updateData,
+    );
+    if (!prescription)
+      throw new BadRequestError('Failed to update prescription');
+
+    new SuccessResponse('Prescription updated successfully', prescription).send(
       res,
     );
   }),

@@ -16,6 +16,12 @@ export default interface Prescription {
     instructions?: string;
   }>;
   diagnosis?: string;
+  refillRequest?: {
+    reason: string;
+    preferredPharmacy?: Types.ObjectId;
+    status: 'PENDING' | 'APPROVED' | 'REJECTED';
+    requestedAt: Date;
+  };
   notes?: string;
   status: 'ACTIVE' | 'COMPLETED' | 'CANCELLED';
   createdAt?: Date;
@@ -49,6 +55,9 @@ const schema = new Schema<Prescription>(
     ],
     diagnosis: {
       type: Schema.Types.String,
+    },
+    refillRequest: {
+      type: Schema.Types.Mixed,
     },
     notes: {
       type: Schema.Types.String,
