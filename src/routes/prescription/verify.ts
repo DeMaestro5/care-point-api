@@ -16,7 +16,6 @@ router.post(
   validator(schema.verifyPrescription),
   pharmacyAuth,
   asyncHandler(async (req: ProtectedRequest, res) => {
-    console.log('params', req.params);
     const { prescriptionId } = req.params;
     const { verified, notes } = req.body;
 
@@ -24,11 +23,7 @@ router.post(
       new Types.ObjectId(prescriptionId),
     );
 
-    console.log(prescription);
     if (!prescription) throw new BadRequestError('Prescription not found');
-
-    console.log(req.params.pharmacyId);
-    console.log(prescription.pharmacy?.toString());
 
     // Verify that the pharmacy has access to this prescription
     if (prescription.pharmacy?.toString() !== req.params.pharmacyId) {
