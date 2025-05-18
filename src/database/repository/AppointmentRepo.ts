@@ -103,11 +103,6 @@ async function update(
   update: Partial<Appointment>,
 ): Promise<PopulatedAppointment | null> {
   try {
-    console.log('Repository: Updating appointment:', {
-      id: id.toString(),
-      updateData: update,
-    });
-
     // First, get the existing appointment to check if it exists
     const existingAppointment = await AppointmentModel.findById(id);
 

@@ -77,4 +77,9 @@ export default {
     description: Joi.string().required(),
     priority: Joi.string().valid('LOW', 'MEDIUM', 'HIGH').required(),
   }),
+  updateEmergencyRequestStatus: Joi.object({
+    status: Joi.string()
+      .valid('PENDING', 'ACCEPTED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED')
+      .required(),
+  }),
 };

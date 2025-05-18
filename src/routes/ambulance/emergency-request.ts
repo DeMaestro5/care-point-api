@@ -53,4 +53,23 @@ router.get(
   }),
 );
 
+// Update emergency request status
+router.put(
+  '/:id/status',
+  validator(schema.updateEmergencyRequestStatus),
+  asyncHandler(async (req: ProtectedRequest, res) => {
+    const emergencyRequest = await EmergencyRequestRepo.update(
+      new Types.ObjectId(req.params.id),
+      req.body,
+    );
+    if (!emergencyRequest) {
+      throw new BadRequestError('Emergency request not found');
+    }
+    new SuccessResponse(
+      'Emergency request updated successfully',
+      emergencyRequest,
+    ).send(res);
+  }),
+);
+
 export default router;

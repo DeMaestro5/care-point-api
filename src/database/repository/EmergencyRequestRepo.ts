@@ -24,7 +24,12 @@ async function findById(id: Types.ObjectId): Promise<EmergencyRequest | null> {
   return EmergencyRequestModel.findById(id);
 }
 
+async function update(id: Types.ObjectId, data: Partial<EmergencyRequest>) {
+  return EmergencyRequestModel.findByIdAndUpdate(id, data, { new: true });
+}
+
 export default {
   create,
   findById,
+  update,
 };
