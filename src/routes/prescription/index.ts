@@ -14,6 +14,9 @@ import doctorAuth from '../../auth/doctorAuth';
 import authentication from '../../auth/authentication';
 import statusRouter from './status';
 import refillRouter from './refill';
+import historyRouter from './history';
+import verifyRouter from './verify';
+import dispenseRouter from './dispense';
 
 const router = express.Router();
 
@@ -24,6 +27,12 @@ router.use(authentication);
 // Mount sub-routes
 router.use('/:prescriptionId/status', statusRouter);
 router.use('/:prescriptionId/refill', refillRouter);
+router.use('/:prescriptionId/history', historyRouter);
+router.use('/:pharmacyId/prescriptions/:prescriptionId/verify', verifyRouter);
+router.use(
+  '/:pharmacyId/prescriptions/:prescriptionId/dispense',
+  dispenseRouter,
+);
 
 // List prescriptions with filtering
 router.get(

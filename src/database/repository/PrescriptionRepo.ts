@@ -9,7 +9,6 @@ async function create(prescription: Prescription): Promise<Prescription> {
 }
 
 async function findById(id: Types.ObjectId): Promise<Prescription | null> {
-  console.log(id);
   return PrescriptionModel.findOne({ _id: id, status: { $ne: 'CANCELLED' } })
     .lean<Prescription>()
     .exec();
