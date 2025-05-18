@@ -18,6 +18,22 @@ export default interface Ambulance {
   serviceArea?: string[];
   contactNumber?: string;
   operatingHours?: string[];
+  coverage?: {
+    _id?: Types.ObjectId;
+    area: string;
+    radius: number;
+    priority: number;
+    operatingHours: {
+      day: string;
+      startTime: string;
+      endTime: string;
+    }[];
+    restrictions: string[];
+    notes?: string;
+    isActive: boolean;
+    createdAt?: Date;
+    updatedAt?: Date;
+  }[];
   baseLocation?: {
     address: string;
     coordinates: {
@@ -49,6 +65,69 @@ const schema = new Schema<Ambulance>(
     vehicleCount: {
       type: Schema.Types.Number,
     },
+    coverage: [
+      {
+        area: {
+          type: Schema.Types.String,
+          required: true,
+        },
+        radius: {
+          type: Schema.Types.Number,
+          required: true,
+        },
+        priority: {
+          type: Schema.Types.Number,
+          default: 3,
+          min: 1,
+          max: 5,
+        },
+        operatingHours: [
+          {
+            day: {
+              type: Schema.Types.String,
+              required: true,
+              enum: [
+                'monday',
+                'tuesday',
+                'wednesday',
+                'thursday',
+                'friday',
+                'saturday',
+                'sunday',
+              ],
+            },
+            startTime: {
+              type: Schema.Types.String,
+              required: true,
+            },
+            endTime: {
+              type: Schema.Types.String,
+              required: true,
+            },
+          },
+        ],
+        restrictions: [
+          {
+            type: Schema.Types.String,
+          },
+        ],
+        notes: {
+          type: Schema.Types.String,
+        },
+        isActive: {
+          type: Schema.Types.Boolean,
+          default: true,
+        },
+        createdAt: {
+          type: Schema.Types.Date,
+          default: Date.now,
+        },
+        updatedAt: {
+          type: Schema.Types.Date,
+          default: Date.now,
+        },
+      },
+    ],
     equipments: [
       {
         type: Schema.Types.String,

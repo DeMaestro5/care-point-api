@@ -28,7 +28,7 @@ router.use('/api/v1/token', token);
 router.use('/api/v1/reset-password', resetPassword);
 router.use('/api/v1/patients', patientRoutes);
 router.use('/api/v1/doctors', doctorRoutes);
-router.use('/api/v1/ambulances', ambulanceRoutes);
+router.use('/api/v1/ambulance-services', ambulanceRoutes);
 router.use('/api/v1/pharmacies', pharmacyRoutes);
 router.use('/api/v1/appointments', appointmentRoutes);
 router.use('/api/v1/prescriptions', prescriptionRoutes);
