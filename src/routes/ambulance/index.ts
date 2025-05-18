@@ -8,6 +8,7 @@ import authentication from '../../auth/authentication';
 import { Types } from 'mongoose';
 import coverageRouter from './coverage';
 import emergencyRequestRouter from './emergency-request';
+import locationRouter from './location';
 
 const router = express.Router();
 
@@ -17,6 +18,7 @@ router.use(authentication);
 
 router.use('/coverage', coverageRouter);
 router.use('/emergency-requests', emergencyRequestRouter);
+router.use('/:ambulanceId/location', locationRouter);
 
 router.get(
   '/',

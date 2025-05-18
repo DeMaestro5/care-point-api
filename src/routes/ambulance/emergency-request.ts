@@ -1,7 +1,7 @@
 import express from 'express';
 import { Types } from 'mongoose';
 import { ProtectedRequest } from '../../types/app-request';
-import validator from '../../helpers/validator';
+import validator, { ValidationSource } from '../../helpers/validator';
 import schema from './schema';
 import asyncHandler from '../../helpers/asyncHandler';
 import authentication from '../../auth/authentication';
@@ -30,6 +30,30 @@ router.post(
     new SuccessResponse(
       'Emergency request created successfully',
       emergencyRequest,
+    ).send(res);
+  }),
+);
+
+// Get nearby emergency requests
+router.get(
+  '/nearby',
+  validator(schema.findNearBy, ValidationSource.QUERY),
+  asyncHandler(async (req: ProtectedRequest, res) => {
+    const { latitude, longitude, maxDistance } = req.query;
+
+    const nearbyEmergencyRequests = await EmergencyRequestRepo.findNearBy(
+      Number(latitude),
+      Number(longitude),
+      maxDistance ? Number(maxDistance) : undefined,
+    );
+
+    if (nearbyEmergencyRequests.length === 0) {
+      throw new BadRequestError('No nearby emergency requests found');
+    }
+
+    new SuccessResponse(
+      'Nearby emergency requests retrieved successfully',
+      nearbyEmergencyRequests,
     ).send(res);
   }),
 );
