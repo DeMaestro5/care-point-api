@@ -16,4 +16,7 @@ export default {
     meetingLink: Joi.string().optional(),
     notes: Joi.string().optional(),
   }),
+  chatMessage: Joi.object({
+    message: Joi.string().required().min(1).max(1000),
+  }),
 };
