@@ -1,6 +1,6 @@
 import express from 'express';
 import { SuccessResponse } from '../../core/ApiResponse';
-import { RoleRequest } from 'app-request';
+import { RoleRequest } from '../../types/app-request.d';
 import crypto from 'crypto';
 import UserRepo from '../../database/repository/UserRepo';
 import { BadRequestError } from '../../core/ApiError';

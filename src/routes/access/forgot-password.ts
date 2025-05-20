@@ -1,10 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { SuccessResponse } from '../../core/ApiResponse';
 import { BadRequestError } from '../../core/ApiError';
-import { Types } from 'mongoose';
 import { UserModel } from '../../database/model/User';
-import { createTokens } from '../../auth/authUtils';
-import { tokenInfo } from '../../config';
 import schema from './schema';
 import validator from '../../helpers/validator';
 import crypto from 'crypto';
