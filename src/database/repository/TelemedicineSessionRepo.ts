@@ -65,22 +65,6 @@ async function update(
     { $set: { ...data, updatedAt: new Date() } },
     { new: true },
   )
-    .populate({
-      path: 'patient',
-      select: 'name user dateOfBirth gender',
-      populate: {
-        path: 'user',
-        select: 'name email profilePicUrl',
-      },
-    })
-    .populate({
-      path: 'doctor',
-      select: 'name specialization user hospital',
-      populate: {
-        path: 'user',
-        select: 'name email profilePicUrl',
-      },
-    })
     .populate('prescription')
     .lean()
     .exec();
