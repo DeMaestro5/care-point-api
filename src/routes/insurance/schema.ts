@@ -19,10 +19,6 @@ export default {
     dateOfService: Joi.date().required(),
   }),
 
-  claimStatus: Joi.object().keys({
-    id: Joi.string().required(),
-  }),
-
   coverage: Joi.object().keys({
     patientId: Joi.string().required(),
     serviceType: Joi.string().required(),
