@@ -75,22 +75,6 @@ router.post(
   }),
 );
 
-// Get claim status
-router.get(
-  '/claims/:id',
-  validator(schema.claimStatus),
-  asyncHandler(async (req: ProtectedRequest, res) => {
-    const claim = await InsuranceClaimRepo.findById(
-      new Types.ObjectId(req.params.id),
-    );
-    if (!claim) {
-      throw new NotFoundError('Claim not found');
-    }
-
-    res.status(200).json({ data: claim });
-  }),
-);
-
 // List insurance providers
 router.get(
   '/providers',
@@ -139,4 +123,18 @@ router.get(
   }),
 );
 
+// Get claim status
+router.get(
+  '/claims/:id',
+  asyncHandler(async (req: ProtectedRequest, res) => {
+    const claim = await InsuranceClaimRepo.findById(
+      new Types.ObjectId(req.params.id),
+    );
+    if (!claim) {
+      throw new NotFoundError('Claim not found');
+    }
+
+    res.status(200).json({ data: claim });
+  }),
+);
 export default router;
