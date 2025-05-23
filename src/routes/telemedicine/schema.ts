@@ -19,4 +19,7 @@ export default {
   chatMessage: Joi.object({
     message: Joi.string().required().min(1).max(1000),
   }),
+  toggleRecording: Joi.object({
+    isRecording: Joi.boolean().required(),
+  }),
 };

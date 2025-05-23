@@ -14,6 +14,7 @@ import pharmacyRoutes from './pharmacy';
 import appointmentRoutes from './appointment';
 import prescriptionRoutes from './prescription';
 import telemedicineRoutes from './telemedicine';
+import insuranceRoutes from './insurance';
 const router = express.Router();
 
 /*---------------------------------------------------------*/
@@ -34,5 +35,6 @@ router.use('/api/v1/pharmacies', pharmacyRoutes);
 router.use('/api/v1/appointments', appointmentRoutes);
 router.use('/api/v1/prescriptions', prescriptionRoutes);
 router.use('/api/v1/telemedicine', telemedicineRoutes);
+router.use('/api/v1/insurance', insuranceRoutes);
 
 export default router;
