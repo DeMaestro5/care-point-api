@@ -10,6 +10,8 @@ export default interface TelemedicineSession extends Document {
   notes?: string;
   diagnosis?: string;
   prescription?: Types.ObjectId;
+  isRecording: boolean;
+  recordingUrl?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -57,6 +59,14 @@ const schema = new Schema(
     prescription: {
       type: Schema.Types.ObjectId,
       ref: 'Prescription',
+    },
+    isRecording: {
+      type: Boolean,
+      default: false,
+    },
+    recordingUrl: {
+      type: String,
+      trim: true,
     },
   },
   {

@@ -8,6 +8,10 @@ import schema from './schema';
 import asyncHandler from '../../helpers/asyncHandler';
 import authentication from '../../auth/authentication';
 import { Types } from 'mongoose';
+import status from './status';
+import token from './token';
+import recording from './recording';
+import chat from './chat';
 
 const router = express.Router();
 
@@ -15,6 +19,11 @@ const router = express.Router();
 // Below all routes require authenticated user
 /*-------------------------------------------------------------------------*/
 router.use(authentication);
+
+router.use('/sessions/:id/status', status);
+router.use('/sessions/:id/token', token);
+router.use('/sessions/:id/recording', recording);
+router.use('/sessions/:id/chat', chat);
 
 router.post(
   '/sessions',
