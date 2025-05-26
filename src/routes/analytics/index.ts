@@ -10,6 +10,10 @@ import PharmacyRepo from '../../database/repository/PharmacyRepo';
 import AppointmentRepo from '../../database/repository/AppointmentRepo';
 import PrescriptionRepo from '../../database/repository/PrescriptionRepo';
 import { Types } from 'mongoose';
+import revenueRoutes from './revenue';
+import trendsRoutes from './trends';
+import generateReportsRoutes from './generateReports';
+import dashboardRoutes from './dashboard';
 
 const router = express.Router();
 
@@ -18,6 +22,10 @@ const router = express.Router();
 /*-------------------------------------------------------------------------*/
 router.use(authentication);
 
+router.use('/revenue', revenueRoutes);
+router.use('/trends', trendsRoutes);
+router.use('/generate-reports', generateReportsRoutes);
+router.use('/dashboards/:type', dashboardRoutes);
 // Get patient analytics
 router.get(
   '/patients',
@@ -199,6 +207,86 @@ router.get(
       pharmacyMetrics: pharmacyMetrics.filter(
         (metric): metric is NonNullable<typeof metric> => metric !== null,
       ),
+    }).send(res);
+  }),
+);
+
+// Get appointment analytics
+router.get(
+  '/appointments',
+  validator(schema.getAppointmentAnalytics),
+  asyncHandler(async (req: ProtectedRequest, res) => {
+    const { startDate, endDate, groupBy } = req.query;
+
+    // Get appointments in period
+    const appointments = await AppointmentRepo.findByFilter(
+      {
+        createdAt: {
+          $gte: new Date(startDate as string),
+          $lte: new Date(endDate as string),
+        },
+      },
+      { page: 1, limit: 1000 },
+    );
+
+    // Group appointments by time period
+    const groupedAppointments = appointments.appointments.reduce(
+      (acc: any, apt) => {
+        const date = new Date(apt.appointmentDate);
+        let key: string;
+
+        switch (groupBy) {
+          case 'week':
+            const weekStart = new Date(date);
+            weekStart.setDate(date.getDate() - date.getDay());
+            key = weekStart.toISOString().split('T')[0];
+            break;
+          case 'month':
+            key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
+              2,
+              '0',
+            )}`;
+            break;
+          default: // day
+            key = date.toISOString().split('T')[0];
+        }
+
+        if (!acc[key]) {
+          acc[key] = {
+            total: 0,
+            completed: 0,
+            cancelled: 0,
+            rescheduled: 0,
+          };
+        }
+
+        acc[key].total++;
+        acc[key][apt.status.toLowerCase()]++;
+
+        return acc;
+      },
+      {},
+    );
+
+    new SuccessResponse('Appointment analytics retrieved successfully', {
+      period: {
+        startDate,
+        endDate,
+        groupBy,
+      },
+      appointments: groupedAppointments,
+      summary: {
+        total: appointments.total,
+        completed: appointments.appointments.filter(
+          (apt) => apt.status === 'completed',
+        ).length,
+        cancelled: appointments.appointments.filter(
+          (apt) => apt.status === 'cancelled',
+        ).length,
+        rescheduled: appointments.appointments.filter(
+          (apt) => apt.status === 'rescheduled',
+        ).length,
+      },
     }).send(res);
   }),
 );
