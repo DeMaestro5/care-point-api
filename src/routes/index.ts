@@ -17,6 +17,7 @@ import telemedicineRoutes from './telemedicine';
 import insuranceRoutes from './insurance';
 import notificationRoutes from './notifications';
 import analyticsRoutes from './analytics';
+import medicalRecordsRoutes from './medical-records';
 const router = express.Router();
 
 /*---------------------------------------------------------*/
@@ -40,5 +41,6 @@ router.use('/api/v1/telemedicine', telemedicineRoutes);
 router.use('/api/v1/insurance', insuranceRoutes);
 router.use('/api/v1/notifications', notificationRoutes);
 router.use('/api/v1/analytics', analyticsRoutes);
+router.use('/api/v1/medical-records', medicalRecordsRoutes);
 
 export default router;

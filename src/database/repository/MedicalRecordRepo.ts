@@ -1,5 +1,6 @@
 import { Types } from 'mongoose';
 import { MedicalRecordModel } from '../model/MedicalRecord';
+import MedicalRecord from '../model/MedicalRecord';
 
 async function findByPatientId(patientId: Types.ObjectId) {
   return MedicalRecordModel.find({ patient: patientId })
@@ -35,15 +36,7 @@ async function create(
   return medicalRecord.toObject();
 }
 
-async function update(
-  id: Types.ObjectId,
-  data: {
-    diagnosis?: string;
-    treatment?: string;
-    notes?: string;
-    attachments?: string[];
-  },
-) {
+async function update(id: Types.ObjectId, data: Partial<MedicalRecord>) {
   return MedicalRecordModel.findByIdAndUpdate(
     id,
     { $set: { ...data, updatedAt: new Date() } },
