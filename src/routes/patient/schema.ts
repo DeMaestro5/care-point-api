@@ -79,4 +79,17 @@ export default {
     isActive: Joi.boolean().default(true),
     notes: Joi.string().optional(),
   }),
+  vitalSigns: Joi.object().keys({
+    bloodPressure: Joi.object({
+      systolic: Joi.number().min(0).optional(),
+      diastolic: Joi.number().min(0).optional(),
+    }).optional(),
+    heartRate: Joi.number().min(0).optional(),
+    temperature: Joi.number().min(0).optional(),
+    respiratoryRate: Joi.number().min(0).optional(),
+    oxygenSaturation: Joi.number().min(0).max(100).optional(),
+    weight: Joi.number().min(0).optional(),
+    height: Joi.number().min(0).optional(),
+    notes: Joi.string().optional(),
+  }),
 };

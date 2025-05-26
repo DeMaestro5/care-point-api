@@ -9,7 +9,7 @@ import schema from './schema';
 import MedicalRecordRepo from '../../database/repository/MedicalRecordRepo';
 import doctorAuth from '../../auth/doctorAuth';
 import type MedicalRecord from '../../database/model/MedicalRecord';
-import { MedicalRecordModel } from '../../database/model/MedicalRecord';
+// import { MedicalRecordModel } from '../../database/model/MedicalRecord';
 
 const router = express.Router({ mergeParams: true });
 
@@ -118,16 +118,10 @@ router.put(
       // Check if the record has valid references
       if (!existingRecord.patient || !existingRecord.createdBy) {
         // This is a recovery path for records with missing references
-        const fixedRecord = await MedicalRecordModel.findByIdAndUpdate(
-          recordId,
-          {
-            $set: {
-              patient: patientId,
-              createdBy: doctorId,
-            },
-          },
-          { new: true },
-        ).exec();
+        const fixedRecord = await MedicalRecordRepo.update(recordId, {
+          patient: patientId,
+          createdBy: doctorId,
+        });
 
         if (fixedRecord) {
           // Re-fetch the record
