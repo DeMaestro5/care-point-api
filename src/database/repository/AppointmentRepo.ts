@@ -8,26 +8,28 @@ type PopulatedAppointment = any; // TODO: Create proper type for populated appoi
 async function findByPatientId(
   patientId: Types.ObjectId,
 ): Promise<PopulatedAppointment[]> {
-  return AppointmentModel.find({ patient: patientId })
-    .populate({
-      path: 'doctor',
-      select: 'name specialization user hospital',
-      populate: {
-        path: 'user',
-        select: 'name email',
-      },
-    })
-    .populate({
-      path: 'patient',
-      select: 'name user dateOfBirth gender',
-      populate: {
-        path: 'user',
-        select: 'name email',
-      },
-    })
-    .sort({ appointmentDate: -1 })
-    .lean()
-    .exec();
+  return (
+    AppointmentModel.find({ patient: patientId })
+      .populate({
+        path: 'doctor',
+        select: 'name specialization user hospital',
+        populate: {
+          path: 'user',
+          select: 'name email',
+        },
+      })
+      // .populate({
+      //   path: 'patient',
+      //   select: 'name user dateOfBirth gender',
+      //   populate: {
+      //     path: 'user',
+      //     select: 'name email',
+      //   },
+      // })
+      .sort({ appointmentDate: -1 })
+      .lean()
+      .exec()
+  );
 }
 
 async function findById(
