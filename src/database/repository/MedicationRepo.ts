@@ -48,9 +48,17 @@ async function update(
   return MedicationModel.findByIdAndUpdate(id, data, { new: true }).lean();
 }
 
+async function getCategories(): Promise<string[]> {
+  const categories = await MedicationModel.distinct('category', {
+    status: true,
+  });
+  return categories.sort();
+}
+
 export default {
   findById,
   search,
   create,
   update,
+  getCategories,
 };

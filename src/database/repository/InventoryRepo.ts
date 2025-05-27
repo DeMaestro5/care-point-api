@@ -11,18 +11,25 @@ async function findByPharmacyId(
   limit = 10,
 ): Promise<{ items: Inventory[]; total: number }> {
   const skip = (page - 1) * limit;
-  const items = await InventoryModel.find({
-    pharmacy: pharmacyId,
+  const query = { pharmacy: pharmacyId, status: true };
+
+  const [items, total] = await Promise.all([
+    InventoryModel.find(query).sort({ name: 1 }).skip(skip).limit(limit).lean(),
+    InventoryModel.countDocuments(query),
+  ]);
+
+  return { items, total };
+}
+
+async function findByMedicationId(
+  medicationId: Types.ObjectId,
+): Promise<Inventory[]> {
+  return InventoryModel.find({
+    medication: medicationId,
     status: true,
   })
-    .skip(skip)
-    .limit(limit)
+    .populate('pharmacy', 'name address coordinates')
     .lean();
-  const total = await InventoryModel.countDocuments({
-    pharmacy: pharmacyId,
-    status: true,
-  });
-  return { items, total };
 }
 
 async function create(inventory: Partial<Inventory>): Promise<Inventory> {
@@ -33,33 +40,80 @@ async function create(inventory: Partial<Inventory>): Promise<Inventory> {
   return created.toObject();
 }
 
-async function update(inventory: Partial<Inventory>): Promise<Inventory> {
-  const now = new Date();
-  inventory.updatedAt = now;
-  const updated = await InventoryModel.findByIdAndUpdate(
-    inventory._id,
-    inventory,
-    { new: true },
-  ).lean();
-  if (!updated) throw new Error('Inventory not found');
-  return updated;
+async function update(
+  inventory: Partial<Inventory>,
+): Promise<Inventory | null> {
+  inventory.updatedAt = new Date();
+  return InventoryModel.findByIdAndUpdate(inventory._id, inventory, {
+    new: true,
+  }).lean();
 }
 
-async function deleteInventory(id: Types.ObjectId): Promise<Inventory> {
-  const now = new Date();
-  const deleted = await InventoryModel.findByIdAndUpdate(
+async function deleteInventory(id: Types.ObjectId): Promise<Inventory | null> {
+  return InventoryModel.findByIdAndUpdate(
     id,
-    { status: false, updatedAt: now },
+    { status: false, updatedAt: new Date() },
     { new: true },
   ).lean();
-  if (!deleted) throw new Error('Inventory not found');
-  return deleted;
+}
+
+async function batchUpdate(
+  pharmacyId: Types.ObjectId,
+  updates: Array<{
+    medicationId: string;
+    quantity: number;
+    price: number;
+    expiryDate?: Date;
+    batchNumber?: string;
+  }>,
+): Promise<Inventory[]> {
+  const results: Inventory[] = [];
+
+  for (const update of updates) {
+    const existingInventory = await InventoryModel.findOne({
+      pharmacy: pharmacyId,
+      medication: new Types.ObjectId(update.medicationId),
+      status: true,
+    });
+
+    if (existingInventory) {
+      // Update existing inventory
+      const updated = await InventoryModel.findByIdAndUpdate(
+        existingInventory._id,
+        {
+          quantity: update.quantity,
+          price: update.price,
+          expiryDate: update.expiryDate,
+          batchNumber: update.batchNumber,
+          updatedAt: new Date(),
+        },
+        { new: true },
+      ).lean();
+      if (updated) results.push(updated);
+    } else {
+      // Create new inventory entry
+      const created = await create({
+        pharmacy: pharmacyId,
+        medication: new Types.ObjectId(update.medicationId),
+        quantity: update.quantity,
+        price: update.price,
+        expiryDate: update.expiryDate,
+        batchNumber: update.batchNumber,
+        status: true,
+      });
+      results.push(created);
+    }
+  }
+
+  return results;
 }
 
 export default {
   findById,
   findByPharmacyId,
+  findByMedicationId,
   create,
   update,
   delete: deleteInventory,
+  batchUpdate,
 };
