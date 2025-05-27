@@ -6,15 +6,12 @@ export const COLLECTION_NAME = 'inventories';
 export interface Inventory {
   _id: Types.ObjectId;
   pharmacy: Types.ObjectId;
-  name: string;
-  description?: string;
-  category: string;
+  medication: Types.ObjectId;
   quantity: number;
   unit: string;
   price: number;
   expiryDate?: Date;
   batchNumber?: string;
-  manufacturer?: string;
   status: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -27,19 +24,10 @@ const schema = new Schema<Inventory>(
       ref: 'Pharmacy',
       required: true,
     },
-    name: {
-      type: Schema.Types.String,
+    medication: {
+      type: Schema.Types.ObjectId,
+      ref: 'Medication',
       required: true,
-      trim: true,
-    },
-    description: {
-      type: Schema.Types.String,
-      trim: true,
-    },
-    category: {
-      type: Schema.Types.String,
-      required: true,
-      trim: true,
     },
     quantity: {
       type: Schema.Types.Number,
@@ -60,10 +48,6 @@ const schema = new Schema<Inventory>(
       type: Schema.Types.Date,
     },
     batchNumber: {
-      type: Schema.Types.String,
-      trim: true,
-    },
-    manufacturer: {
       type: Schema.Types.String,
       trim: true,
     },
@@ -88,9 +72,8 @@ const schema = new Schema<Inventory>(
 );
 
 schema.index({ pharmacy: 1 });
+schema.index({ medication: 1 });
 schema.index({ status: 1 });
-schema.index({ name: 1 });
-schema.index({ category: 1 });
 
 export const InventoryModel = model<Inventory>(
   DOCUMENT_NAME,
