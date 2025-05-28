@@ -19,6 +19,7 @@ import notificationRoutes from './notifications';
 import analyticsRoutes from './analytics';
 import medicalRecordsRoutes from './medical-records';
 import medicationRoutes from './medication';
+import laboratoryRoutes from './laboratory';
 
 const router = express.Router();
 
@@ -45,5 +46,6 @@ router.use('/api/v1/notifications', notificationRoutes);
 router.use('/api/v1/analytics', analyticsRoutes);
 router.use('/api/v1/medical-records', medicalRecordsRoutes);
 router.use('/api/v1/medications', medicationRoutes);
+router.use('/api/v1/laboratory', laboratoryRoutes);
 
 export default router;
