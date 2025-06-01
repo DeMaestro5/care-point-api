@@ -146,6 +146,10 @@ async function findByDoctorId(doctorId: Types.ObjectId): Promise<Patient[]> {
     .exec();
 }
 
+async function count(filters: any = {}): Promise<number> {
+  return PatientModel.countDocuments(filters).exec();
+}
+
 export default {
   findById,
   findByUserId,
@@ -156,4 +160,5 @@ export default {
   updateMedicalHistoryEntry,
   getMedicalHistory,
   findByDoctorId,
+  count,
 };

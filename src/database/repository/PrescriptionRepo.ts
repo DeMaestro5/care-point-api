@@ -107,8 +107,8 @@ async function find(
     .exec();
 }
 
-async function count(filter: any): Promise<number> {
-  return PrescriptionModel.countDocuments(filter).exec();
+async function count(filters: any = {}): Promise<number> {
+  return PrescriptionModel.countDocuments(filters).exec();
 }
 
 export default {

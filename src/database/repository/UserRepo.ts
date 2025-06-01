@@ -102,6 +102,10 @@ async function updateInfo(user: User): Promise<any> {
     .exec();
 }
 
+async function count(filters: any = {}): Promise<number> {
+  return UserModel.countDocuments(filters).exec();
+}
+
 export default {
   exists,
   findPrivateProfileById,
@@ -112,4 +116,5 @@ export default {
   create,
   update,
   updateInfo,
+  count,
 };

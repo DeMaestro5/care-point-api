@@ -23,6 +23,47 @@ import Pharmacy from '../../database/model/Pharmacy';
 
 const router = express.Router();
 
+// Admin signup endpoint
+router.post(
+  '/admin',
+  validator(schema.adminSignup),
+  asyncHandler(async (req: RoleRequest, res) => {
+    const user = await UserRepo.findByEmail(req.body.email);
+    if (user) throw new BadRequestError('User already registered');
+
+    const accessTokenKey = crypto.randomBytes(64).toString('hex');
+    const refreshTokenKey = crypto.randomBytes(64).toString('hex');
+    const passwordHash = await bcrypt.hash(req.body.password, 10);
+
+    const { user: createdUser, keystore } = await UserRepo.create(
+      {
+        name: req.body.name,
+        email: req.body.email,
+        profilePicUrl: req.body.profilePicUrl,
+        password: passwordHash,
+      } as User,
+      accessTokenKey,
+      refreshTokenKey,
+      RoleCode.ADMIN,
+    );
+
+    const tokens = await createTokens(
+      createdUser,
+      keystore.primaryKey,
+      keystore.secondaryKey,
+    );
+    const userData = await getUserData(createdUser);
+
+    new SuccessResponse('Admin Signup Successful', {
+      user: {
+        ...userData,
+        role: createdUser.role,
+      },
+      tokens: tokens,
+    }).send(res);
+  }),
+);
+
 router.post(
   '/basic',
   validator(schema.signup),

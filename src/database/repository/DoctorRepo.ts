@@ -92,10 +92,15 @@ async function searchDoctors({
   };
 }
 
+async function count(filters: any = {}): Promise<number> {
+  return DoctorModel.countDocuments(filters).exec();
+}
+
 export default {
   findById,
   findByUserId,
   create,
   update,
   searchDoctors,
+  count,
 };
