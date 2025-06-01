@@ -78,22 +78,22 @@ async function create(
     const populatedAppointment = await AppointmentModel.findById(
       createdAppointment._id,
     )
-      // .populate({
-      //   path: 'doctor',
-      //   select: '_id name specialization user hospital',
-      //   populate: {
-      //     path: 'user',
-      //     select: '_id name email',
-      //   },
-      // })
-      // .populate({
-      //   path: 'patient',
-      //   select: '_id name user dateOfBirth gender',
-      //   populate: {
-      //     path: 'user',
-      //     select: '_id name email',
-      //   },
-      // })
+      .populate({
+        path: 'doctor',
+        select: '_id name specialization user hospital',
+        populate: {
+          path: 'user',
+          select: '_id name email',
+        },
+      })
+      .populate({
+        path: 'patient',
+        select: '_id name user dateOfBirth gender',
+        populate: {
+          path: 'user',
+          select: '_id name email',
+        },
+      })
       .lean()
       .exec();
 

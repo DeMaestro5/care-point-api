@@ -23,11 +23,9 @@ router.post(
   validator(schema.bulkAppointments),
   asyncHandler(async (req: ProtectedRequest, res) => {
     const { appointments } = req.body;
-    console.log(appointments);
 
     const createdAppointments = await Promise.all(
       appointments.map(async (appointment: any) => {
-        console.log('appointment', appointment);
         return AppointmentRepo.create({
           patient: appointment.patientId,
           doctor: appointment.doctorId,
@@ -39,8 +37,6 @@ router.post(
         });
       }),
     );
-
-    console.log(createdAppointments);
 
     new SuccessResponse(
       'Appointments created successfully',
