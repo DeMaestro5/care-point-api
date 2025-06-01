@@ -11,6 +11,12 @@ export default interface Appointment extends Document {
   reason: string;
   notes?: string;
   checkInTime?: Date;
+  appointmentType:
+    | 'REGULAR'
+    | 'FOLLOW_UP'
+    | 'EMERGENCY'
+    | 'CONSULTATION'
+    | 'OTHER';
   createdAt: Date;
   updatedAt: Date;
 }
@@ -28,7 +34,6 @@ const schema = new Schema(
       ref: 'Patient',
       required: true,
       index: true,
-      select: false,
     },
     appointmentDate: {
       type: Date,
@@ -53,6 +58,13 @@ const schema = new Schema(
     },
     checkInTime: {
       type: Date,
+    },
+    appointmentType: {
+      type: String,
+      required: true,
+      enum: ['REGULAR', 'FOLLOW_UP', 'EMERGENCY', 'CONSULTATION', 'OTHER'],
+      default: 'REGULAR',
+      index: true,
     },
   },
   {

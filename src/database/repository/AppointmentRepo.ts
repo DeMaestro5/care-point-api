@@ -39,18 +39,18 @@ async function findById(
   const appointment = await AppointmentModel.findById(id)
     .populate({
       path: 'doctor',
-      select: 'name specialization user hospital',
+      select: '_id name specialization user hospital',
       populate: {
         path: 'user',
-        select: 'name email',
+        select: '_id name email',
       },
     })
     .populate({
       path: 'patient',
-      select: 'name user dateOfBirth gender',
+      select: '_id name user dateOfBirth gender',
       populate: {
         path: 'user',
-        select: 'name email',
+        select: '_id name email',
       },
     })
     .lean()
@@ -74,18 +74,26 @@ async function create(
 
     const createdAppointment = await AppointmentModel.create(appointmentData);
 
-    // Fetch the populated appointment without patient data
+    // Fetch the populated appointment with patient and doctor data
     const populatedAppointment = await AppointmentModel.findById(
       createdAppointment._id,
     )
-      .populate({
-        path: 'doctor',
-        select: 'name specialization user hospital',
-        populate: {
-          path: 'user',
-          select: 'name email',
-        },
-      })
+      // .populate({
+      //   path: 'doctor',
+      //   select: '_id name specialization user hospital',
+      //   populate: {
+      //     path: 'user',
+      //     select: '_id name email',
+      //   },
+      // })
+      // .populate({
+      //   path: 'patient',
+      //   select: '_id name user dateOfBirth gender',
+      //   populate: {
+      //     path: 'user',
+      //     select: '_id name email',
+      //   },
+      // })
       .lean()
       .exec();
 
@@ -146,10 +154,18 @@ async function update(
     )
       .populate({
         path: 'doctor',
-        select: 'name specialization user hospital',
+        select: '_id name specialization user hospital',
         populate: {
           path: 'user',
-          select: 'name email',
+          select: '_id name email',
+        },
+      })
+      .populate({
+        path: 'patient',
+        select: '_id name user dateOfBirth gender',
+        populate: {
+          path: 'user',
+          select: '_id name email',
         },
       })
       .lean()
@@ -176,18 +192,18 @@ async function deleteById(
   })
     .populate({
       path: 'doctor',
-      select: 'name specialization user hospital',
+      select: '_id name specialization user hospital',
       populate: {
         path: 'user',
-        select: 'name email',
+        select: '_id name email',
       },
     })
     .populate({
       path: 'patient',
-      select: 'name user dateOfBirth gender',
+      select: '_id name user dateOfBirth gender',
       populate: {
         path: 'user',
-        select: 'name email',
+        select: '_id name email',
       },
     })
     .lean()
@@ -207,18 +223,18 @@ async function findUpcomingByPatientId(
   })
     .populate({
       path: 'doctor',
-      select: 'name specialization user hospital',
+      select: '_id name specialization user hospital',
       populate: {
         path: 'user',
-        select: 'name email',
+        select: '_id name email',
       },
     })
     .populate({
       path: 'patient',
-      select: 'name user dateOfBirth gender',
+      select: '_id name user dateOfBirth gender',
       populate: {
         path: 'user',
-        select: 'name email',
+        select: '_id name email',
       },
     })
     .sort({ appointmentDate: 1 })
@@ -229,28 +245,26 @@ async function findUpcomingByPatientId(
 async function findByDoctorId(
   doctorId: Types.ObjectId,
 ): Promise<PopulatedAppointment[]> {
-  return (
-    AppointmentModel.find({ doctor: doctorId })
-      // .populate({
-      //   path: 'patient',
-      //   select: 'name user dateOfBirth gender',
-      //   populate: {
-      //     path: 'user',
-      //     select: 'name email',
-      //   },
-      // })
-      .populate({
-        path: 'doctor',
-        select: 'name specialization user hospital',
-        populate: {
-          path: 'user',
-          select: 'name email',
-        },
-      })
-      .sort({ appointmentDate: -1 })
-      .lean()
-      .exec()
-  );
+  return AppointmentModel.find({ doctor: doctorId })
+    .populate({
+      path: 'doctor',
+      select: '_id name specialization user hospital',
+      populate: {
+        path: 'user',
+        select: '_id name email',
+      },
+    })
+    .populate({
+      path: 'patient',
+      select: '_id name user dateOfBirth gender',
+      populate: {
+        path: 'user',
+        select: '_id name email',
+      },
+    })
+    .sort({ appointmentDate: -1 })
+    .lean()
+    .exec();
 }
 
 async function findByFilter(
@@ -266,10 +280,18 @@ async function findByFilter(
     AppointmentModel.find(filter)
       .populate({
         path: 'doctor',
-        select: 'name specialization user hospital',
+        select: '_id name specialization user hospital',
         populate: {
           path: 'user',
-          select: 'name email',
+          select: '_id name email',
+        },
+      })
+      .populate({
+        path: 'patient',
+        select: '_id name user dateOfBirth gender',
+        populate: {
+          path: 'user',
+          select: '_id name email',
         },
       })
       .sort({ appointmentDate: -1 })
@@ -353,6 +375,10 @@ async function getAvailability(
   return availableSlots;
 }
 
+async function count(filters: any = {}): Promise<number> {
+  return AppointmentModel.countDocuments(filters).exec();
+}
+
 export default {
   findByPatientId,
   findById,
@@ -363,4 +389,5 @@ export default {
   findByDoctorId,
   findByFilter,
   getAvailability,
+  count,
 };
