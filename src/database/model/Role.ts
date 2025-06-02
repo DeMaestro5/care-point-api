@@ -7,6 +7,7 @@ export enum RoleCode {
   ADMIN = 'ADMIN',
   DOCTOR = 'DOCTOR',
   PATIENT = 'PATIENT',
+  STAFF = 'STAFF',
   AMBULANCE = 'AMBULANCE',
   PHARMACY = 'PHARMACY',
 }
