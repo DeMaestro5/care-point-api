@@ -1,0 +1,19 @@
+APPOINTMENT CONFIRMATION
+
+Dear {{name}},
+
+Your appointment has been confirmed for:
+Date: {{appointmentDate}}
+Time: {{appointmentTime}}
+Location: {{location}}
+Doctor: {{doctorName}}
+
+Please bring:
+- ID
+- Insurance card
+- List of medications
+
+Contact: {{phoneNumber}}
+
+Best regards,
+{{clinicName}} 

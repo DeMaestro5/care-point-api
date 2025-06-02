@@ -1,0 +1,21 @@
+# Prescription
+
+Patient: {{patientName}}
+Date: {{prescriptionDate}}
+
+## Medication Details
+Medication: {{medicationName}}
+Dosage: {{dosage}}
+Frequency: {{frequency}}
+Duration: {{duration}}
+
+## Instructions
+{{instructions}}
+
+## Prescribing Doctor
+Name: {{doctorName}}
+License: {{licenseNumber}}
+Contact: {{contactNumber}}
+
+---
+This prescription is valid for {{validityPeriod}} days from the date of issue. 

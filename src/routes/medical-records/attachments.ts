@@ -4,6 +4,9 @@ import { NotFoundError } from '../../core/ApiError';
 import upload from '../../helpers/upload';
 import { ProtectedRequest } from '../../types/app-request';
 import asyncHandler from '../../helpers/asyncHandler';
+import { uploadToGridFS } from '../../helpers/gridfs';
+import { FileModel } from '../../database/model/File';
+import { Types } from 'mongoose';
 
 const router = Router({ mergeParams: true });
 /**
@@ -27,8 +30,27 @@ router.post(
       throw new NotFoundError('Medical record not found');
     }
 
-    // Get file URLs from the uploaded files
-    const fileUrls = files.map((file) => file.path);
+    // Upload files to GridFS and save metadata
+    const uploadPromises = files.map(async (file) => {
+      const gridfsResult = await uploadToGridFS({
+        buffer: file.buffer,
+        filename: file.originalname,
+        mimetype: file.mimetype,
+        uploadedBy: req.user._id.toString(),
+      });
+
+      // Save file metadata
+      await FileModel.create({
+        filename: gridfsResult.filename,
+        mimetype: gridfsResult.contentType,
+        size: gridfsResult.length,
+        uploadedBy: new Types.ObjectId(req.user._id),
+      });
+
+      return `gridfs://${gridfsResult.fileId}`;
+    });
+
+    const fileUrls = await Promise.all(uploadPromises);
 
     // Add new attachments to the existing ones
     medicalRecord.attachments = [
