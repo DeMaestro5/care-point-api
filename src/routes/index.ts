@@ -23,6 +23,7 @@ import laboratoryRoutes from './laboratory';
 import referralRoutes from './referrals';
 import adminRoutes from './admin';
 import carePlanRoutes from './care-plans';
+import documentRoutes from './documents';
 
 const router = express.Router();
 
@@ -53,5 +54,6 @@ router.use('/api/v1/laboratory', laboratoryRoutes);
 router.use('/api/v1/referrals', referralRoutes);
 router.use('/api/v1/admin', adminRoutes);
 router.use('/api/v1/care-plans', carePlanRoutes);
+router.use('/api/v1/documents', documentRoutes);
 
 export default router;

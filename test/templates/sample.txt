@@ -1,0 +1,19 @@
+Dear {{name}},
+
+Thank you for your interest in our services. This is a confirmation of your appointment scheduled for {{appointmentDate}} at {{appointmentTime}}.
+
+Appointment Details:
+- Date: {{appointmentDate}}
+- Time: {{appointmentTime}}
+- Location: {{location}}
+- Doctor: {{doctorName}}
+
+Please bring the following items:
+1. Your ID
+2. Insurance card
+3. List of current medications
+
+If you need to reschedule, please call us at {{phoneNumber}} at least 24 hours before your appointment.
+
+Best regards,
+{{clinicName}} 
