@@ -62,6 +62,7 @@ async function batchUpdate(
   updates: Array<{
     medicationId: string;
     quantity: number;
+    unit: string;
     price: number;
     expiryDate?: Date;
     batchNumber?: string;
@@ -82,6 +83,7 @@ async function batchUpdate(
         existingInventory._id,
         {
           quantity: update.quantity,
+          unit: update.unit,
           price: update.price,
           expiryDate: update.expiryDate,
           batchNumber: update.batchNumber,
@@ -96,6 +98,7 @@ async function batchUpdate(
         pharmacy: pharmacyId,
         medication: new Types.ObjectId(update.medicationId),
         quantity: update.quantity,
+        unit: update.unit,
         price: update.price,
         expiryDate: update.expiryDate,
         batchNumber: update.batchNumber,
@@ -116,4 +119,74 @@ export default {
   update,
   delete: deleteInventory,
   batchUpdate,
+  findLowStock,
+  findExpiringMedications,
+  getInventoryAlerts,
 };
+
+async function findLowStock(
+  pharmacyId?: Types.ObjectId,
+  threshold = 10,
+): Promise<Inventory[]> {
+  const query: any = {
+    quantity: { $lte: threshold },
+    status: true,
+  };
+
+  if (pharmacyId) {
+    query.pharmacy = pharmacyId;
+  }
+
+  return InventoryModel.find(query)
+    .populate('pharmacy', 'name address city')
+    .populate('medication', 'name genericName')
+    .sort({ quantity: 1 })
+    .lean();
+}
+
+async function findExpiringMedications(
+  pharmacyId?: Types.ObjectId,
+  daysAhead = 30,
+): Promise<Inventory[]> {
+  const cutoffDate = new Date();
+  cutoffDate.setDate(cutoffDate.getDate() + daysAhead);
+
+  const query: any = {
+    expiryDate: { $lte: cutoffDate },
+    status: true,
+  };
+
+  if (pharmacyId) {
+    query.pharmacy = pharmacyId;
+  }
+
+  return InventoryModel.find(query)
+    .populate('pharmacy', 'name address city')
+    .populate('medication', 'name genericName')
+    .sort({ expiryDate: 1 })
+    .lean();
+}
+
+async function getInventoryAlerts(pharmacyId?: Types.ObjectId): Promise<{
+  lowStock: Inventory[];
+  expiring: Inventory[];
+  expired: Inventory[];
+}> {
+  const now = new Date();
+
+  const [lowStock, expiring, expired] = await Promise.all([
+    findLowStock(pharmacyId, 10),
+    findExpiringMedications(pharmacyId, 30),
+    InventoryModel.find({
+      ...(pharmacyId ? { pharmacy: pharmacyId } : {}),
+      expiryDate: { $lt: now },
+      status: true,
+    })
+      .populate('pharmacy', 'name address city')
+      .populate('medication', 'name genericName')
+      .sort({ expiryDate: 1 })
+      .lean(),
+  ]);
+
+  return { lowStock, expiring, expired };
+}

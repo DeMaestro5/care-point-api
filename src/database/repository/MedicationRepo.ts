@@ -5,6 +5,17 @@ async function findById(id: Types.ObjectId): Promise<Medication | null> {
   return MedicationModel.findById(id).lean();
 }
 
+async function findByNameAndStrength(
+  name: string,
+  strength: string,
+): Promise<Medication | null> {
+  return MedicationModel.findOne({
+    name: { $regex: new RegExp(`^${name}$`, 'i') },
+    strength,
+    status: true,
+  }).lean();
+}
+
 async function search(
   query: string,
   page = 1,
@@ -57,6 +68,7 @@ async function getCategories(): Promise<string[]> {
 
 export default {
   findById,
+  findByNameAndStrength,
   search,
   create,
   update,
