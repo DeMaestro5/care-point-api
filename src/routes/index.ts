@@ -29,6 +29,7 @@ import communicationRoutes from './communication';
 import inventoryRoutes from './inventory';
 import configurationRoutes from './configuration';
 import mobileRoutes from './mobile';
+import reportsAndExportsRoutes from './reports-and-exports';
 
 const router = express.Router();
 
@@ -65,5 +66,6 @@ router.use('/api/v1/messages', communicationRoutes);
 router.use('/api/v1/inventory', inventoryRoutes);
 router.use('/api/v1/configuration', configurationRoutes);
 router.use('/api/v1/mobile', mobileRoutes);
+router.use('/api/v1/reports', reportsAndExportsRoutes);
 
 export default router;
