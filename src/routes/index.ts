@@ -27,6 +27,7 @@ import carePlanRoutes from './care-plans';
 import documentRoutes from './documents';
 import communicationRoutes from './communication';
 import inventoryRoutes from './inventory';
+import configurationRoutes from './configuration';
 
 const router = express.Router();
 
@@ -61,5 +62,6 @@ router.use('/api/v1/care-plans', carePlanRoutes);
 router.use('/api/v1/documents', documentRoutes);
 router.use('/api/v1/messages', communicationRoutes);
 router.use('/api/v1/inventory', inventoryRoutes);
+router.use('/api/v1/configuration', configurationRoutes);
 
 export default router;
