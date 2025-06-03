@@ -32,6 +32,7 @@ import mobileRoutes from './mobile';
 import reportsAndExportsRoutes from './reports-and-exports';
 import calendarRoutes from './calendar';
 import healthEducationRoutes from './health-education';
+import searchRoutes from './search';
 
 const router = express.Router();
 
@@ -71,5 +72,6 @@ router.use('/api/v1/mobile', mobileRoutes);
 router.use('/api/v1/reports', reportsAndExportsRoutes);
 router.use('/api/v1/calendar', calendarRoutes);
 router.use('/api/v1/education', healthEducationRoutes);
+router.use('/api/v1/search', searchRoutes);
 
 export default router;
