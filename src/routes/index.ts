@@ -26,6 +26,7 @@ import adminRoutes from './admin';
 import carePlanRoutes from './care-plans';
 import documentRoutes from './documents';
 import communicationRoutes from './communication';
+import inventoryRoutes from './inventory';
 
 const router = express.Router();
 
@@ -59,5 +60,6 @@ router.use('/api/v1/admin', adminRoutes);
 router.use('/api/v1/care-plans', carePlanRoutes);
 router.use('/api/v1/documents', documentRoutes);
 router.use('/api/v1/messages', communicationRoutes);
+router.use('/api/v1/inventory', inventoryRoutes);
 
 export default router;

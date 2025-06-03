@@ -10,6 +10,7 @@ export default interface Medication {
   description?: string;
   category: string;
   manufacturer: string;
+  unit: string;
   dosageForm: string;
   strength: string;
   prescriptionRequired: boolean;
@@ -46,6 +47,11 @@ const schema = new Schema<Medication>(
       index: true,
     },
     manufacturer: {
+      type: Schema.Types.String,
+      required: true,
+      trim: true,
+    },
+    unit: {
       type: Schema.Types.String,
       required: true,
       trim: true,

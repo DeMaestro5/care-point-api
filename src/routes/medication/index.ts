@@ -19,6 +19,78 @@ const router = express.Router();
 /*-------------------------------------------------------------------------*/
 router.use(authentication);
 
+// Get all medications
+router.get(
+  '/',
+  asyncHandler(async (req: ProtectedRequest, res) => {
+    const { query = '', page = 1, limit = 10 } = req.query;
+
+    const medications = await MedicationRepo.search(
+      query as string,
+      Number(page),
+      Number(limit),
+    );
+
+    new SuccessResponse('Medications retrieved successfully', medications).send(
+      res,
+    );
+  }),
+);
+
+// Create new medication
+router.post(
+  '/',
+  validator(schema.createMedication),
+  asyncHandler(async (req: ProtectedRequest, res) => {
+    const {
+      name,
+      genericName,
+      description,
+      category,
+      unit,
+      manufacturer,
+      dosageForm,
+      strength,
+      prescriptionRequired,
+      sideEffects,
+      contraindications,
+      storageInstructions,
+    } = req.body;
+
+    // Check if medication with same name and strength already exists
+    const existingMedication = await MedicationRepo.findByNameAndStrength(
+      name,
+      strength,
+    );
+
+    if (existingMedication) {
+      throw new BadRequestError(
+        'Medication with this name and strength already exists',
+      );
+    }
+
+    const medication = await MedicationRepo.create({
+      name,
+      genericName,
+      description,
+      category,
+      unit,
+      manufacturer,
+      dosageForm,
+      strength,
+      prescriptionRequired: prescriptionRequired || false,
+      sideEffects: sideEffects || [],
+      contraindications: contraindications || [],
+      storageInstructions,
+      status: true,
+    });
+
+    new SuccessResponse('Medication created successfully', medication).send(
+      res,
+    );
+  }),
+);
+
 // Get medication alternatives
 router.get(
   '/:id/alternatives',
