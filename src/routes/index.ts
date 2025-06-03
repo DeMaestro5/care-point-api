@@ -30,6 +30,7 @@ import inventoryRoutes from './inventory';
 import configurationRoutes from './configuration';
 import mobileRoutes from './mobile';
 import reportsAndExportsRoutes from './reports-and-exports';
+import calendarRoutes from './calendar';
 
 const router = express.Router();
 
@@ -67,5 +68,6 @@ router.use('/api/v1/inventory', inventoryRoutes);
 router.use('/api/v1/configuration', configurationRoutes);
 router.use('/api/v1/mobile', mobileRoutes);
 router.use('/api/v1/reports', reportsAndExportsRoutes);
+router.use('/api/v1/calendar', calendarRoutes);
 
 export default router;
