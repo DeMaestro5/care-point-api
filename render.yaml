@@ -1,0 +1,27 @@
+services:
+  - type: web
+    name: care-point-api
+    env: node
+    buildCommand: npm run build-prod || npm run build-emergency
+    startCommand: npm run start-prod
+    healthCheckPath: /health
+    autoDeploy: true
+    plan: starter
+    region: oregon
+    scaling:
+      minInstances: 1
+      maxInstances: 3
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_OPTIONS
+        value: --max-old-space-size=4096
+      - key: PORT
+        value: 3000
+      # Add your other environment variables here
+      # - key: MONGODB_URI
+      #   sync: false
+      # - key: REDIS_HOST
+      #   sync: false
+      # - key: REDIS_PASSWORD
+      #   sync: false

@@ -22,8 +22,15 @@
     "baseUrl": ".",
     "paths": {
       "*": ["node_modules/*", "src/types/*"]
-    }
+    },
+    // Memory optimization settings
+    "incremental": true,
+    "tsBuildInfoFile": "./build/.tsbuildinfo",
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "declaration": false,
+    "removeComments": true
   },
   "include": ["src/**/*"],
-  "exclude": [".templates"]
+  "exclude": [".templates", "node_modules", "build", "tests", "test"]
 }
