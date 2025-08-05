@@ -12,6 +12,7 @@
     "build-emergency": "npm run clean && node --max-old-space-size=2048 ./node_modules/.bin/tsc --skipLibCheck --noEmitOnError false",
     "start-prod": "node build/server.js",
     "start-prod-with-env": "node -r dotenv/config build/server.js",
+    "start-simple": "node scripts/start.js",
     "deploy-check": "node scripts/deploy-check.js",
     "watch": "npx concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"yellow.bold,cyan.bold,green.bold\" \"npm run watch-ts\" \"npm run watch-node\"",
     "watch-node": "nodemon -r dotenv/config build/server.js",

@@ -33,6 +33,7 @@ RUN npm ci --only=production && npm cache clean --force
 
 # Copy built application from builder stage
 COPY --from=builder /app/build ./build
+COPY --from=builder /app/scripts ./scripts
 
 # Create non-root user
 RUN groupadd -r appuser && useradd -r -g appuser appuser
@@ -49,5 +50,5 @@ EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
   CMD node -e "require('http').get('http://localhost:3000/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })" || exit 1
 
-# Start the application
-CMD ["npm", "run", "start-prod"]
+# Start the application with fallback
+CMD ["sh", "-c", "npm run start-prod || npm run start-simple"]
