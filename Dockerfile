@@ -37,6 +37,11 @@ COPY --from=builder /app/scripts ./scripts
 
 # Create non-root user
 RUN groupadd -r appuser && useradd -r -g appuser appuser
+
+# Create logs directory and set permissions
+RUN mkdir -p /app/logs && chown -R appuser:appuser /app
+
+# Switch to non-root user
 USER appuser
 
 # Set environment variables
