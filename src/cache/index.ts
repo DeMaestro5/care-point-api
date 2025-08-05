@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import Logger from '../core/Logger';
 
 // Mock Redis client that doesn't actually connect to Redis
@@ -11,29 +12,31 @@ const mockClient = {
     Logger.info('Mock cache disconnected');
     return Promise.resolve();
   },
-  exists: async (...keys: string[]) => false,
-  set: async (key: string, value: string) => 'OK',
-  get: async (key: string) => null,
-  del: async (key: string) => 1,
-  type: async (key: string) => 'none',
-  pSetEx: async (key: string, milliseconds: number, value: string) => 'OK',
+  exists: async (..._keys: string[]) => false,
+  set: async (_key: string, _value: string) => 'OK',
+  get: async (_key: string) => null,
+  del: async (_key: string) => 1,
+  type: async (_key: string) => 'none',
+  pSetEx: async (_key: string, _milliseconds: number, _value: string) => 'OK',
   multi: () => ({
-    del: (key: string) => mockClient.multi(),
-    rPush: (key: string, values: any[]) => mockClient.multi(),
-    pExpireAt: (key: string, timestamp: number) => mockClient.multi(),
+    del: (_key: string) => mockClient.multi(),
+    rPush: (_key: string, _values: any[]) => mockClient.multi(),
+    zAdd: (_key: string, _items: Array<{ score: number; value: string }>) =>
+      mockClient.multi(),
+    pExpireAt: (_key: string, _timestamp: number) => mockClient.multi(),
     exec: async () => [],
   }),
-  rPushX: async (key: string, value: string) => 0,
-  lRange: async (key: string, start: number, end: number) => [],
-  zAdd: async (key: string, items: Array<{ score: number; value: string }>) =>
+  rPushX: async (_key: string, _value: string) => 0,
+  lRange: async (_key: string, _start: number, _end: number) => [],
+  zAdd: async (_key: string, _items: Array<{ score: number; value: string }>) =>
     0,
-  zRem: async (key: string, members: string[]) => 0,
-  zRangeWithScores: async (key: string, start: number, end: number) => [],
-  zScore: async (key: string, member: string) => null,
-  watch: async (key: string) => 'OK',
+  zRem: async (_key: string, _members: string[]) => 0,
+  zRangeWithScores: async (_key: string, _start: number, _end: number) => [],
+  zScore: async (_key: string, _member: string) => null,
+  watch: async (_key: string) => 'OK',
   unwatch: async () => 'OK',
-  pExpireAt: async (key: string, timestamp: number) => 1,
-  eval: async (script: string) => 0,
+  pExpireAt: async (_key: string, _timestamp: number) => 1,
+  eval: async (_script: string) => 0,
 };
 
 // Initialize the mock cache

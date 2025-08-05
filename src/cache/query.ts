@@ -10,7 +10,7 @@ export enum TYPES {
 }
 
 export async function keyExists(...keys: string[]) {
-  return (await cache.exists(keys)) ? true : false;
+  return (await cache.exists(...keys)) ? true : false;
 }
 
 export async function setValue(
@@ -55,7 +55,7 @@ export async function setList(
   expireAt: Date | null = null,
 ) {
   const multi = cache.multi();
-  const values: any[] = []
+  const values: any[] = [];
   for (const i in list) {
     values[i] = JSON.stringify(list[i]);
   }
@@ -94,11 +94,15 @@ export async function setOrderedSet(
   expireAt: Date | null = null,
 ) {
   const multi = cache.multi();
+  const redisItems: Array<{ score: number; value: string }> = [];
   for (const item of items) {
-    item.value = JSON.stringify(item.value);
+    redisItems.push({
+      score: item.score,
+      value: JSON.stringify(item.value),
+    });
   }
   multi.del(key);
-  multi.zAdd(key, items);
+  multi.zAdd(key, redisItems);
   if (expireAt) multi.pExpireAt(key, expireAt.getTime());
   return await multi.exec();
 }
@@ -110,10 +114,14 @@ export async function addToOrderedSet(
   const type = await cache.type(key);
   if (type !== TYPES.ZSET) return null;
 
+  const redisItems: Array<{ score: number; value: string }> = [];
   for (const item of items) {
-    item.value = JSON.stringify(item.value);
+    redisItems.push({
+      score: item.score,
+      value: JSON.stringify(item.value),
+    });
   }
-  return await cache.zAdd(key, items);
+  return await cache.zAdd(key, redisItems);
 }
 
 export async function removeFromOrderedSet(key: Key, ...items: any[]) {
@@ -130,7 +138,7 @@ export async function getOrderedSetRange<T>(key: Key, start = 0, end = -1) {
 
   const set = await cache.zRangeWithScores(key, start, end);
 
-  const data: { score: number; value: T }[] = set.map((entry) => ({
+  const data: { score: number; value: T }[] = set.map((entry: any) => ({
     score: entry.score,
     value: JSON.parse(entry.value),
   }));
