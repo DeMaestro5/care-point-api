@@ -3,7 +3,7 @@ services:
     name: care-point-api
     env: node
     buildCommand: npm run build-prod || npm run build-emergency
-    startCommand: npm run start-prod
+    startCommand: npm run start-prod || npm run start-simple
     healthCheckPath: /health
     autoDeploy: true
     plan: starter

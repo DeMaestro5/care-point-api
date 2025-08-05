@@ -1,7 +1,13 @@
 // Mapper for environment variables
-export const environment = process.env.NODE_ENV;
-export const port = process.env.PORT;
-export const timezone = process.env.TZ;
+export const environment = process.env.NODE_ENV || 'development';
+export const port = process.env.PORT || 3000;
+export const timezone = process.env.TZ || 'UTC';
+
+// Log environment for debugging
+console.log('Environment:', environment);
+console.log('Port:', port);
+console.log('MongoDB URI configured:', !!process.env.MONGODB_URI);
+console.log('Redis Host configured:', !!process.env.REDIS_HOST);
 
 export const db = {
   name: process.env.DB_NAME || '',
