@@ -44,6 +44,13 @@ Set these environment variables in your Render dashboard:
 
 ## Troubleshooting
 
+### Module Not Found Errors
+If you encounter "Cannot find module 'dotenv/config'" errors:
+
+1. **The issue has been fixed**: `dotenv` is now in production dependencies
+2. **Use the simplified start command**: `npm run start-prod` (no dotenv required)
+3. **Environment variables**: Set them directly in Render dashboard instead of using .env files
+
 ### Memory Issues During Build
 If you encounter "JavaScript heap out of memory" errors:
 
