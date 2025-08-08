@@ -65,7 +65,6 @@ export async function processPDFTemplate(
       contentType: 'application/pdf',
     };
   } catch (error) {
-    console.error('Error processing PDF template:', error);
     throw new BadRequestError('Failed to process PDF template');
   }
 }
@@ -135,7 +134,6 @@ export async function processDOCXTemplate(
         'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
     };
   } catch (error) {
-    console.error('Error processing DOCX template:', error);
     throw new BadRequestError('Failed to process DOCX template');
   }
 }
@@ -159,7 +157,6 @@ export async function processTextTemplate(
       contentType: 'text/plain',
     };
   } catch (error) {
-    console.error('Error processing text template:', error);
     throw new BadRequestError('Failed to process text template');
   }
 }

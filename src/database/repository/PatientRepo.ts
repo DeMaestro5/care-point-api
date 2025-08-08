@@ -14,12 +14,6 @@ async function findById(id: Types.ObjectId): Promise<Patient | null> {
       .exec();
   }
 
-  console.log(
-    `Final patient result with status filter: ${
-      patient ? 'Found' : 'Not found'
-    }`,
-  );
-
   return patient;
 }
 

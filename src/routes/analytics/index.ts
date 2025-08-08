@@ -116,7 +116,6 @@ router.get(
       const doctorPrescriptions = prescriptions.filter(
         (presc) => presc.doctor.toString() === doctor._id.toString(),
       );
-      console.log(doctor);
 
       return {
         doctorId: doctor._id,
