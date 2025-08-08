@@ -47,14 +47,12 @@ router.get(
       }
 
       const patientId = new Types.ObjectId(req.params.id);
-      console.log('Searching for patient with ID:', patientId.toString());
 
       // Try to find by direct ID first
       let patient = await PatientRepo.findById(patientId);
 
       // If not found by ID, try finding by user ID if authenticated user is the patient
       if (!patient && req.user) {
-        console.log('Patient not found by ID, trying user ID:', req.user._id);
         patient = await PatientRepo.findByUserId(req.user._id);
       }
 
@@ -65,25 +63,14 @@ router.get(
         req.user &&
         req.params.id === req.user._id.toString()
       ) {
-        console.log('Trying to find patient with user ID directly');
         patient = await PatientRepo.findByUserId(
           new Types.ObjectId(req.params.id),
         );
       }
 
-      console.log('Patient search result:', patient ? 'Found' : 'Not found');
-
       if (!patient) throw new BadRequestError('Patient not found');
-      console.log('patient.user:', patient.user, 'req.user._id:', req.user._id);
-      console.log(
-        'patient.user.toString():',
-        patient.user.toString(),
-        'req.user._id.toString():',
-        req.user._id.toString(),
-      );
       new SuccessResponse('success', patient).send(res);
     } catch (error) {
-      console.error('Error in patient lookup:', error);
       throw error;
     }
   }),
@@ -100,7 +87,6 @@ router.get(
       }
 
       const userId = new Types.ObjectId(req.params.userId);
-      console.log('Searching for patient with user ID:', userId.toString());
 
       const patient = await PatientRepo.findByUserId(userId);
 
@@ -108,7 +94,6 @@ router.get(
         throw new BadRequestError('Patient not found for this user');
       new SuccessResponse('success', patient).send(res);
     } catch (error) {
-      console.error('Error in patient lookup by user ID:', error);
       throw error;
     }
   }),
@@ -123,11 +108,6 @@ router.get(
         throw new BadRequestError('User not authenticated');
       }
 
-      console.log(
-        'Looking up patient profile for authenticated user:',
-        req.user._id,
-      );
-
       const patient = await PatientRepo.findByUserId(req.user._id);
 
       if (!patient)
@@ -136,7 +116,6 @@ router.get(
         );
       new SuccessResponse('success', patient).send(res);
     } catch (error) {
-      console.error('Error in patient profile lookup:', error);
       throw error;
     }
   }),
@@ -186,7 +165,6 @@ router.put(
           updateData[field] = req.body[field];
         } else {
           // We don't throw here to allow partial updates - just silently ignore fields the user can't update
-          console.log(`Field ${field} requires doctor privileges, skipping`);
         }
       }
       // All other fields - apply standard permission check
