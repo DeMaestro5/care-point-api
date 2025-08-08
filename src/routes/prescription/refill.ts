@@ -70,11 +70,6 @@ router.post(
       },
     );
 
-    console.log('Update Result:', {
-      prescriptionId,
-      updated: !!updatedPrescription,
-    });
-
     if (!updatedPrescription)
       throw new BadRequestError('Failed to create refill request');
 

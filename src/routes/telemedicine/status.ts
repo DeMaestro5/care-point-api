@@ -19,8 +19,6 @@ router.put(
       { status: req.body.status },
     );
 
-    console.log(session);
-
     if (!session) throw new BadRequestError('Telemedicine session not found');
     new SuccessResponse('success', session).send(res);
   }),

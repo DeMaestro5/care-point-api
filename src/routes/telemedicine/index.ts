@@ -51,7 +51,6 @@ router.get(
     const session = await TelemedicineSessionRepo.findById(
       new Types.ObjectId(req.params.id),
     );
-    console.log(session);
 
     if (!session) throw new BadRequestError('Telemedicine session not found');
     new SuccessResponse('success', session).send(res);
