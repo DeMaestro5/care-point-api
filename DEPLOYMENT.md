@@ -44,6 +44,13 @@ Set these environment variables in your Render dashboard:
 
 ## Troubleshooting
 
+### Permission Denied Errors
+If you encounter "EACCES: permission denied, mkdir '/app/logs'" errors:
+
+1. **The issue has been fixed**: The Dockerfile now creates the logs directory with proper permissions
+2. **Logger is robust**: The application will fall back to console-only logging if file logging fails
+3. **Non-root user**: The application runs as `appuser` for security
+
 ### Module Not Found Errors
 If you encounter "Cannot find module 'dotenv/config'" errors:
 

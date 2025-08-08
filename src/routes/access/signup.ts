@@ -33,7 +33,7 @@ router.post(
 );
 
 router.post(
-  '/basic',
+  '/',
   validator(schema.signup),
   asyncHandler(async (req: RoleRequest, res) => {
     const authResponse = await AuthService.signup({

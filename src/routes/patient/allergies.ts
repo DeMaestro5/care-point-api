@@ -19,20 +19,13 @@ router.get(
   '/',
   asyncHandler(async (req: ProtectedRequest, res) => {
     const patientId = new Types.ObjectId(req.params.patientId);
-    console.log('Looking up allergies for patient ID:', patientId.toString());
 
     // Try to find by direct ID first
     let patient = await PatientRepo.findById(patientId);
-    console.log(
-      'Direct patient lookup result:',
-      patient ? 'Found' : 'Not found',
-    );
 
     // If not found by ID, try finding by user ID if authenticated user is the patient
     if (!patient && req.user) {
-      console.log('Patient not found by ID, trying user ID:', req.user._id);
       patient = await PatientRepo.findByUserId(req.user._id);
-      console.log('User ID lookup result:', patient ? 'Found' : 'Not found');
     }
 
     // If still not found and the ID matches the user's ID, try again with the user ID
@@ -42,13 +35,8 @@ router.get(
       req.user &&
       req.params.patientId === req.user._id.toString()
     ) {
-      console.log('Trying to find patient with user ID directly');
       patient = await PatientRepo.findByUserId(
         new Types.ObjectId(req.params.patientId),
-      );
-      console.log(
-        'Final user ID lookup result:',
-        patient ? 'Found' : 'Not found',
       );
     }
 
@@ -80,23 +68,12 @@ router.put(
   validator(schema.updateAllergies),
   asyncHandler(async (req: ProtectedRequest, res) => {
     const patientId = new Types.ObjectId(req.params.patientId);
-    console.log(
-      'Looking up patient for allergies update:',
-      patientId.toString(),
-    );
-
     // Try to find by direct ID first
     let patient = await PatientRepo.findById(patientId);
-    console.log(
-      'Direct patient lookup result:',
-      patient ? 'Found' : 'Not found',
-    );
 
     // If not found by ID, try finding by user ID if authenticated user is the patient
     if (!patient && req.user) {
-      console.log('Patient not found by ID, trying user ID:', req.user._id);
       patient = await PatientRepo.findByUserId(req.user._id);
-      console.log('User ID lookup result:', patient ? 'Found' : 'Not found');
     }
 
     // If still not found and the ID matches the user's ID, try again with the user ID
@@ -106,13 +83,8 @@ router.put(
       req.user &&
       req.params.patientId === req.user._id.toString()
     ) {
-      console.log('Trying to find patient with user ID directly');
       patient = await PatientRepo.findByUserId(
         new Types.ObjectId(req.params.patientId),
-      );
-      console.log(
-        'Final user ID lookup result:',
-        patient ? 'Found' : 'Not found',
       );
     }
 
@@ -132,7 +104,6 @@ router.put(
 
     // Using the actual patient ID from the database, not the parameter
     const actualPatientId = patient._id;
-    console.log('Using actual patient ID for update:', actualPatientId);
 
     // Create update object with minimal required fields
     const updatedPatient = await PatientRepo.update({
@@ -141,11 +112,6 @@ router.put(
       user: patient.user,
       status: true,
     });
-
-    console.log(
-      'Updated patient result:',
-      updatedPatient ? 'Success' : 'Failed',
-    );
 
     if (!updatedPatient) {
       throw new NotFoundResponse('Failed to update allergies');

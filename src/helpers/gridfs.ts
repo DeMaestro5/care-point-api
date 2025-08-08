@@ -1,4 +1,3 @@
-console.log('GridFS helper module is being loaded');
 import { GridFSBucket, ObjectId, Db } from 'mongodb';
 import mongoose from 'mongoose';
 
@@ -50,12 +49,9 @@ export async function uploadToGridFS({
     });
 
     uploadStream.on('finish', async () => {
-      console.log('Upload finished successfully');
-
       try {
         // Get the file ID from the upload stream
         const fileId = uploadStream.id;
-        console.log('File ID from stream:', fileId);
 
         if (!fileId) {
           throw new Error('No file ID received from GridFS');
@@ -68,15 +64,12 @@ export async function uploadToGridFS({
           length: buffer.length,
         };
 
-        console.log('Created result object:', JSON.stringify(result, null, 2));
         resolve(result);
       } catch (error) {
         console.log('Error processing file object:', error);
         reject(error);
       }
     });
-
-    console.log('Writing buffer to stream');
     uploadStream.end(buffer);
   });
 }
