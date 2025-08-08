@@ -35,7 +35,6 @@ async function findByPatientId(
 async function findById(
   id: Types.ObjectId,
 ): Promise<PopulatedAppointment | null> {
-  console.log('Repository: Finding appointment by ID:', id.toString());
   const appointment = await AppointmentModel.findById(id)
     .populate({
       path: 'doctor',
@@ -56,7 +55,6 @@ async function findById(
     .lean()
     .exec();
 
-  console.log('Repository: Found appointment:', appointment);
   return appointment;
 }
 
@@ -103,7 +101,6 @@ async function create(
 
     return populatedAppointment;
   } catch (error) {
-    console.error('Repository: Error creating appointment:', error);
     throw error;
   }
 }
@@ -117,7 +114,6 @@ async function update(
     const existingAppointment = await AppointmentModel.findById(id);
 
     if (!existingAppointment) {
-      console.log('Repository: No existing appointment found');
       return null;
     }
 
@@ -178,7 +174,6 @@ async function update(
     // Convert to plain object to match the expected type
     return updatedAppointment;
   } catch (error) {
-    console.error('Repository: Error updating appointment:', error);
     throw error;
   }
 }
@@ -186,7 +181,6 @@ async function update(
 async function deleteById(
   id: Types.ObjectId,
 ): Promise<PopulatedAppointment | null> {
-  console.log('Repository: Deleting appointment:', id.toString());
   const deletedAppointment = await AppointmentModel.findOneAndDelete({
     _id: id,
   })
@@ -209,7 +203,6 @@ async function deleteById(
     .lean()
     .exec();
 
-  console.log('Repository: Deleted appointment:', deletedAppointment);
   return deletedAppointment;
 }
 
@@ -274,8 +267,6 @@ async function findByFilter(
   const { page, limit } = options;
   const skip = (page - 1) * limit;
 
-  console.log('Repository: Finding appointments with filter:', filter);
-
   const [appointments, total] = await Promise.all([
     AppointmentModel.find(filter)
       .populate({
@@ -302,7 +293,6 @@ async function findByFilter(
     AppointmentModel.countDocuments(filter),
   ]);
 
-  console.log('Repository: Found appointments:', appointments);
   return { appointments, total };
 }
 
