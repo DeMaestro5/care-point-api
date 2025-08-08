@@ -70,13 +70,7 @@ router.post(
       await savedFile.save();
       new SuccessResponse('Document uploaded successfully', document).send(res);
     } catch (error) {
-      console.error('Error saving file or document:', error);
       if (error instanceof Error) {
-        console.error('Error details:', {
-          name: error.name,
-          message: error.message,
-          stack: error.stack,
-        });
       }
       throw error;
     }
@@ -129,14 +123,6 @@ router.post(
 
       new SuccessResponse('Template uploaded successfully', document).send(res);
     } catch (error) {
-      console.error('Error saving template:', error);
-      if (error instanceof Error) {
-        console.error('Error details:', {
-          name: error.name,
-          message: error.message,
-          stack: error.stack,
-        });
-      }
       throw error;
     }
   }),
