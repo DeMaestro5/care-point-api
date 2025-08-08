@@ -19,32 +19,20 @@ export async function uploadToGridFS({
   mimetype: string;
   uploadedBy: string;
 }): Promise<GridFSUploadResult> {
-  console.log('Starting GridFS upload process');
-  console.log('Upload parameters:', {
-    filename,
-    mimetype,
-    uploadedBy,
-    bufferLength: buffer.length,
-  });
-
   // Use the existing mongoose connection
   const db: Db = mongoose.connection.db;
   if (!db) {
-    console.log('MongoDB connection is not established');
     throw new Error('MongoDB connection is not established');
   }
-  console.log('MongoDB connection is established');
   const bucket = new GridFSBucket(db);
 
   return new Promise((resolve, reject) => {
-    console.log('Creating upload stream');
     const uploadStream = bucket.openUploadStream(filename, {
       contentType: mimetype,
       metadata: { uploadedBy },
     });
 
     uploadStream.on('error', (err: any) => {
-      console.log('Upload stream error:', err);
       reject(err);
     });
 
@@ -66,7 +54,6 @@ export async function uploadToGridFS({
 
         resolve(result);
       } catch (error) {
-        console.log('Error processing file object:', error);
         reject(error);
       }
     });
