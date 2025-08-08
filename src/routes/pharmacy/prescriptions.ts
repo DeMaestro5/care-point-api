@@ -11,7 +11,6 @@ import schema from './schema';
 import DoctorRepo from '../../database/repository/DoctorRepo';
 import PatientRepo from '../../database/repository/PatientRepo';
 import pharmacyAuth from '../../auth/pharmacyAuth';
-import { DoctorModel } from '../../database/model/Doctor';
 
 const router = express.Router({ mergeParams: true });
 
@@ -23,12 +22,11 @@ router.post(
   pharmacyAuth,
   asyncHandler(async (req: ProtectedRequest, res) => {
     const pharmacyId = new Types.ObjectId(req.params.pharmacyId);
-    console.log(pharmacyId);
+
     const { patientId, doctorId, medications, diagnosis, notes } = req.body;
 
     // Verify pharmacy exists and belongs to the authenticated user
     const pharmacy = await PharmacyRepo.findById(pharmacyId);
-    console.log(pharmacy);
     if (!pharmacy) throw new BadRequestError('Pharmacy not found');
 
     // Check that the logged-in user is the owner of this pharmacy
@@ -43,15 +41,8 @@ router.post(
     if (!patient) throw new BadRequestError('Patient not found');
 
     // Verify doctor exists
-    console.log('Looking up doctor with ID:', doctorId);
-    // First check if doctor exists without status filter
-    const doctorWithoutStatus = await DoctorModel.findOne({
-      _id: new Types.ObjectId(doctorId),
-    });
-    console.log('Doctor lookup without status filter:', doctorWithoutStatus);
 
     const doctor = await DoctorRepo.findById(new Types.ObjectId(doctorId));
-    console.log('Doctor lookup with status filter:', doctor);
     if (!doctor) throw new BadRequestError('Doctor not found');
 
     const prescription = await PrescriptionRepo.create({

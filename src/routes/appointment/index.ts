@@ -62,14 +62,12 @@ router.get(
       filter.doctor = new Types.ObjectId(req.user._id);
     }
 
-    console.log('Handler: Finding appointments with filter:', filter);
+
 
     const { appointments, total } = await AppointmentRepo.findByFilter(filter, {
       page: Number(page),
       limit: Number(limit),
     });
-
-    console.log('Handler: Found appointments, sending response');
 
     return new SuccessResponse('Appointments retrieved successfully', {
       appointments,
@@ -122,12 +120,7 @@ router.put(
     const { appointmentId } = req.params;
     const { appointmentDate, reason, notes } = req.body;
 
-    console.log('Handler: Updating appointment:', {
-      appointmentId,
-      appointmentDate,
-      reason,
-      notes,
-    });
+
 
     const appointment = await AppointmentRepo.update(
       new Types.ObjectId(appointmentId),
@@ -138,8 +131,7 @@ router.put(
       throw new BadRequestError('Appointment not found or update failed');
     }
 
-    console.log('Handler: Successfully updated appointment:', appointment);
-
+  
     return new SuccessResponse('Appointment updated successfully', {
       appointment,
     }).send(res);

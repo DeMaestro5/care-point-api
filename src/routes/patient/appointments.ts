@@ -76,7 +76,6 @@ router.post(
         },
       }).send(res);
     } catch (error) {
-      console.error('Error creating appointment:', error);
       throw error;
     }
   }),
@@ -199,7 +198,6 @@ router.put(
         response,
       ).send(res);
     } catch (error) {
-      console.error('Error in appointment update:', error);
       throw error;
     }
   }),
@@ -296,7 +294,6 @@ router.delete(
         response,
       ).send(res);
     } catch (error) {
-      console.error('Error in appointment deletion:', error);
       throw error;
     }
   }),

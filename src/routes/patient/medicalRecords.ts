@@ -84,7 +84,6 @@ router.post(
         record,
       }).send(res);
     } catch (error) {
-      console.error('Error creating medical record:', error);
       throw error;
     }
   }),
@@ -179,7 +178,6 @@ router.put(
         },
       }).send(res);
     } catch (error) {
-      console.error('Error updating medical record:', error);
       throw error;
     }
   }),
