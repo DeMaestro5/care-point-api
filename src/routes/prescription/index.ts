@@ -88,12 +88,6 @@ router.post(
   asyncHandler(async (req: ProtectedRequest, res) => {
     const { patientId, pharmacyId, medications, diagnosis, notes } = req.body;
 
-    console.log('Request body:', {
-      patientId,
-      pharmacyId,
-      authenticatedUserId: req.user._id,
-    });
-
     // Verify patient exists
     const patient = await PatientRepo.findByUserId(
       new Types.ObjectId(patientId),
@@ -104,11 +98,6 @@ router.post(
     const doctor = await DoctorRepo.findByUserId(
       new Types.ObjectId(req.user._id),
     );
-    console.log('Found doctor:', {
-      doctorId: doctor?._id,
-      doctorUserId: doctor?.user,
-      authenticatedUserId: req.user._id,
-    });
 
     if (!doctor) throw new BadRequestError('Doctor not found');
 
