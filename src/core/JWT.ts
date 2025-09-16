@@ -9,7 +9,7 @@ import { InternalError, BadTokenError, TokenExpiredError } from './ApiError';
  * subject 		— Intended user of the token.
  * audience 	— Basically identity of the intended recipient of the token.
  * expiresIn	— Expiration time after which the token will be invalid.
- * algorithm 	— Encryption algorithm to be used to protect the token.
+ * algorithm — Encryption algorithm to be used to protect the token.
  */
 
 export class JwtPayload {
@@ -36,7 +36,22 @@ export class JwtPayload {
   }
 }
 
+function normalizeKeyFromEnv(value?: string): string | null {
+  if (!value) return null;
+  const replaced = value.replace(/\\n/g, '\n');
+  if (/BEGIN [A-Z ]+ KEY/.test(replaced)) return replaced;
+  try {
+    const decoded = Buffer.from(replaced, 'base64').toString('utf8');
+    if (/BEGIN [A-Z ]+ KEY/.test(decoded)) return decoded;
+  } catch (_) {
+    // ignore
+  }
+  return replaced;
+}
+
 async function readPublicKey(): Promise<string> {
+  const fromEnv = normalizeKeyFromEnv(process.env.RSA_PUBLIC_KEY);
+  if (fromEnv) return fromEnv;
   return promisify(readFile)(
     path.join(__dirname, '../../keys/public.pem'),
     'utf8',
@@ -44,6 +59,8 @@ async function readPublicKey(): Promise<string> {
 }
 
 async function readPrivateKey(): Promise<string> {
+  const fromEnv = normalizeKeyFromEnv(process.env.RSA_PRIVATE_KEY);
+  if (fromEnv) return fromEnv;
   return promisify(readFile)(
     path.join(__dirname, '../../keys/private.pem'),
     'utf8',
